@@ -4,6 +4,7 @@ import (
 	"example/todo-api/model"
 	db "example/todo-api/model"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,4 +49,99 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"data": todo,
 	})
+}
+
+func (tc *TodoController) GetTodoById(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+
+	}
+
+	todo, err := tc.todoService.GetById(uint(id))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusFound, gin.H{
+		"data": todo,
+	})
+}
+
+func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
+	println(c.Params)
+	title := c.Param("title")
+
+	if title == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Title"})
+		return
+
+	}
+
+	todo, err := tc.todoService.GetByTitle(title)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusFound, gin.H{
+		"data": todo,
+	})
+}
+
+func (tc *TodoController) UpdateTodo(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Неправильний ID"})
+		return
+	}
+
+	todo, err := tc.todoService.GetById(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := c.ShouldBindJSON(todo); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := tc.todoService.Update(todo); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": todo,
+	})
+}
+
+func (tc *TodoController) DeleteTodo(c *gin.Context) {
+	id, errParams := c.Params.Get("id")
+
+	if errParams {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Params"})
+		return
+	}
+
+	if err := tc.todoService.Delete(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":    true,
+		"message": "Ok",
+	})
+
 }
