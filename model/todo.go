@@ -22,7 +22,7 @@ func (t *TodoService) GetById(id uint) (*TodoModel, error) {
 
 func (t *TodoService) GetByTitle(title string) (*TodoModel, error) {
 	var todo TodoModel
-	err := t.db.Where("title = ?", title).First(&todo).Error
+	err := t.db.Where("title LIKE ?", "%"+title+"%").First(&todo).Error
 	return &todo, err
 }
 
