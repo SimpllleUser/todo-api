@@ -20,10 +20,10 @@ func (t *TodoService) GetById(id uint) (*TodoModel, error) {
 	return &todo, err
 }
 
-func (t *TodoService) GetByTitle(title string) (*TodoModel, error) {
-	var todo TodoModel
-	err := t.db.Where("title LIKE ?", "%"+title+"%").First(&todo).Error
-	return &todo, err
+func (t *TodoService) GetByTitle(title string) (*[]TodoModel, error) {
+	var todos []TodoModel
+	err := t.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&todos).Error
+	return &todos, err
 }
 
 func (t *TodoService) GetAll() ([]TodoModel, error) {
