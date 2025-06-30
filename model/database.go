@@ -2,6 +2,7 @@ package model
 
 import (
 	"log"
+	"time"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -16,6 +17,15 @@ type TodoModel struct {
 	Completed   bool   `gorm:"default:false"`
 }
 
+type User struct {
+	ID        uint   `json:"id" gorm:"primaryKey"`
+	Login     string `json:"login" gorm:"unique"`
+	Name      string `json:"name" gorm:"not null"`
+	Password  string `json:"password" gorm:"not null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 const pathToDB = "./todos-db.db"
 
 func ConnectDatabase() {
@@ -27,7 +37,7 @@ func ConnectDatabase() {
 		panic("failed connect to DB")
 	}
 
-	err = database.AutoMigrate(&TodoModel{})
+	err = database.AutoMigrate(&TodoModel{}, &User{})
 	if err != nil {
 		log.Fatal("Error on MIGRATE DB")
 	}
