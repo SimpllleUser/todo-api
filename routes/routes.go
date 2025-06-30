@@ -12,10 +12,8 @@ func SetupRoutes(r *gin.Engine,
 	todoController *controller.TodoController,
 	userController *controller.UserController,
 	authController *controller.AuthController,
+	userService *model.UserService,
 ) {
-
-	userService := model.NewUserService(model.DB)
-
 	api := r.Group("/api/v1")
 	{
 		todos := api.Group("/todos")

@@ -33,6 +33,7 @@ func main() {
 		todoController,
 		userController,
 		authController,
+		userService,
 	)
 
 	r.Run("localhost:8080")

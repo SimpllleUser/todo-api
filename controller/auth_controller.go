@@ -32,10 +32,10 @@ func (ac *AuthController) Login(c *gin.Context) {
 
 	var userFound, err = ac.userService.FindByLogin(authInput.Login)
 
-	// if (userFound.ID != 0) || (err != nil) {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "User with this login already exists"})
-	// 	return
-	// }
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
+		return
+	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(authInput.Password)); err != nil {
 		log.Println("Error comparing password:", err)
@@ -48,7 +48,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 		"exp": time.Now().Add(time.Hour * 24).Unix(), // Time to expire the token
 	})
 
-	token, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY"))) /// TODO set key
+	token, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
