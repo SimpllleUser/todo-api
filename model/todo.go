@@ -37,6 +37,6 @@ func (t *TodoService) Update(todo *TodoModel) error {
 	return t.db.Save(todo).Error
 }
 
-func (t *TodoService) Delete(id string) error {
+func (t *TodoService) Delete(id uint) error {
 	return t.db.Delete(&TodoModel{}, id).Error
 }

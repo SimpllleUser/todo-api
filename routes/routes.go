@@ -26,7 +26,7 @@ func SetupRoutes(r *gin.Engine,
 			todos.GET("/title/:title", todoController.GetTodoByTitle)
 			todos.POST("", todoController.CreateTodos)
 			todos.PATCH("/:id", todoController.UpdateTodo)
-			todos.DELETE("", todoController.DeleteTodo)
+			todos.DELETE("/:id", todoController.DeleteTodo)
 		}
 
 		auth := api.Group("/auth")

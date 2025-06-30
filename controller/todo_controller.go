@@ -97,7 +97,7 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 func (tc *TodoController) UpdateTodo(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Неправильний ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 
@@ -127,21 +127,20 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 }
 
 func (tc *TodoController) DeleteTodo(c *gin.Context) {
-	id, errParams := c.Params.Get("id")
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 
-	if errParams {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Params"})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 
-	if err := tc.todoService.Delete(id); err != nil {
+	if err := tc.todoService.Delete(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data":    true,
-		"message": "Ok",
+		"data": true,
 	})
 
 }
