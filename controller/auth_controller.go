@@ -16,6 +16,8 @@ type AuthController struct {
 	userService *model.UserService
 }
 
+const EXPIRE = time.Hour * 24
+
 func NewAuthController(uService *model.UserService) *AuthController {
 	return &AuthController{
 		userService: uService,
@@ -45,7 +47,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":  userFound.ID,
-		"exp": time.Now().Add(time.Hour * 24).Unix(), // Time to expire the token
+		"exp": time.Now().Add(EXPIRE).Unix(),
 	})
 
 	token, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
