@@ -30,8 +30,6 @@ func SetupRoutes(r *gin.Engine,
 		auth := api.Group("/auth")
 		{
 			auth.POST("/login", authHandler.Login)
-
-			/// TODO fix response on success
 			auth.POST("/registration", userHandler.CreateUser)
 		}
 	}
