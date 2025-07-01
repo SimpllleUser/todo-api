@@ -25,7 +25,7 @@ func main() {
 	authService := service.NewAuthService(userService)
 
 	todoController := handler.NewTodoController(todoService)
-	userController := handler.NewUserController(userService)
+	userController := handler.NewUserController(userService, authService)
 	authController := handler.NewAuthController(authService)
 
 	r := gin.Default()
