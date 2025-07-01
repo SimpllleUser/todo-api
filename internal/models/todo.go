@@ -9,6 +9,10 @@ type TodoModel struct {
 	Completed   bool   `gorm:"default:false"`
 }
 
+func (TodoModel) TableName() string {
+	return "todos"
+}
+
 type TodoService struct {
 	db *gorm.DB
 }

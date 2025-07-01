@@ -15,6 +15,10 @@ type UserModel struct {
 	UpdatedAt time.Time
 }
 
+func (UserModel) TableName() string {
+	return "users"
+}
+
 type AuthInput struct {
 	Login    string `json:"login" binding:"required"`
 	Password string `json:"password" binding:"required"`
