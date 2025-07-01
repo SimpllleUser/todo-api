@@ -2,25 +2,19 @@ package handler
 
 import (
 	model "example/todo-api/internal/models"
-	"log"
+	service "example/todo-api/internal/services"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthController struct {
-	userService *model.UserService
+	authService *service.AuthService
 }
 
-const EXPIRE = time.Hour * 24
-
-func NewAuthController(uService *model.UserService) *AuthController {
+func NewAuthController(aService *service.AuthService) *AuthController {
 	return &AuthController{
-		userService: uService,
+		authService: aService,
 	}
 }
 
@@ -32,27 +26,17 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	var userFound, err = ac.userService.FindByLogin(authInput.Login)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
+	userFound, err := ac.authService.Authenticate(authInput.Login, authInput.Password)
+	if err != nil || userFound.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   "Error authenticating user",
+			"message": err.Error(),
+		})
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(authInput.Password)); err != nil {
-		log.Println("Error comparing password:", err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
-		return
-	}
-
-	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":  userFound.ID,
-		"exp": time.Now().Add(EXPIRE).Unix(),
-	})
-
-	token, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
-
-	if err != nil {
+	token, err := ac.authService.GenerateToken(userFound.ID)
+	if err != nil || userFound == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 		return
 	}

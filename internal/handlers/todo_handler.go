@@ -2,6 +2,7 @@ package handler
 
 import (
 	model "example/todo-api/internal/models"
+	service "example/todo-api/internal/services"
 	"net/http"
 	"strconv"
 
@@ -9,10 +10,10 @@ import (
 )
 
 type TodoController struct {
-	todoService *model.TodoService
+	todoService *service.TodoService
 }
 
-func NewTodoController(tService *model.TodoService) *TodoController {
+func NewTodoController(tService *service.TodoService) *TodoController {
 	return &TodoController{
 		todoService: tService,
 	}

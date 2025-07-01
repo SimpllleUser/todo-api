@@ -2,6 +2,7 @@ package handler
 
 import (
 	model "example/todo-api/internal/models"
+	service "example/todo-api/internal/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,10 +10,10 @@ import (
 )
 
 type UserController struct {
-	userService *model.UserService
+	userService *service.UserService
 }
 
-func NewUserController(uService *model.UserService) *UserController {
+func NewUserController(uService *service.UserService) *UserController {
 	return &UserController{
 		userService: uService,
 	}

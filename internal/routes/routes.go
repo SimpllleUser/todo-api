@@ -3,7 +3,7 @@ package routes
 import (
 	handler "example/todo-api/internal/handlers"
 	"example/todo-api/internal/middlewares"
-	model "example/todo-api/internal/models"
+	service "example/todo-api/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +12,7 @@ func SetupRoutes(r *gin.Engine,
 	todoHandler *handler.TodoController,
 	userHandler *handler.UserController,
 	authHandler *handler.AuthController,
-	userService *model.UserService,
+	userService *service.UserService,
 ) {
 	api := r.Group("/api/v1")
 	{

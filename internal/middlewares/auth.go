@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	model "example/todo-api/internal/models"
+	service "example/todo-api/internal/services"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func CheckAuth(userService *model.UserService) gin.HandlerFunc {
+func CheckAuth(userService *service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		println("Checking authentication...")
 		authHeader := c.GetHeader("Authorization")

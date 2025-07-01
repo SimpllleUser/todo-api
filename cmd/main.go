@@ -4,28 +4,29 @@ import (
 	"example/todo-api/config"
 	"example/todo-api/internal/database"
 	handler "example/todo-api/internal/handlers"
-	model "example/todo-api/internal/models"
 	"example/todo-api/internal/routes"
+	service "example/todo-api/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	const PATH_TO_DB = "../internal/database/app-db.db"
+	config.LoadEnv()
 
-	database.InitDB("internal/database/app-db.db")
+	const PATH_TO_DB = "internal/database/app-db.db"
+
+	database.InitDB(PATH_TO_DB)
 
 	defer database.CloseDB()
 
-	config.LoadEnv()
-
-	todoService := model.NewTodoService(database.DB)
-	userService := model.NewUserService(database.DB)
+	todoService := service.NewTodoService(database.DB)
+	userService := service.NewUserService(database.DB)
+	authService := service.NewAuthService(userService)
 
 	todoController := handler.NewTodoController(todoService)
 	userController := handler.NewUserController(userService)
-	authController := handler.NewAuthController(userService)
+	authController := handler.NewAuthController(authService)
 
 	r := gin.Default()
 
