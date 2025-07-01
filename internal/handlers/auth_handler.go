@@ -1,7 +1,7 @@
-package controller
+package handler
 
 import (
-	"example/todo-api/model"
+	model "example/todo-api/internal/models"
 	"log"
 	"net/http"
 	"os"

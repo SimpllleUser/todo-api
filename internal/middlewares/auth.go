@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"example/todo-api/model"
+	model "example/todo-api/internal/models"
 	"fmt"
 	"net/http"
 	"os"

@@ -1,7 +1,7 @@
-package controller
+package handler
 
 import (
-	"example/todo-api/model"
+	model "example/todo-api/internal/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,7 +41,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
-	user := &model.User{
+	user := &model.UserModel{
 		Login:    authInput.Login,
 		Password: string(passwordHash),
 	}

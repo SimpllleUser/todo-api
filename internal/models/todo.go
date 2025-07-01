@@ -2,6 +2,13 @@ package model
 
 import "gorm.io/gorm"
 
+type TodoModel struct {
+	ID          uint   `gorm:"primaryKey" json:"id"`
+	Title       string `gorm:"not null"`
+	Description string `gorm:"null"`
+	Completed   bool   `gorm:"default:false"`
+}
+
 type TodoService struct {
 	db *gorm.DB
 }

@@ -1,8 +1,7 @@
-package controller
+package handler
 
 import (
-	"example/todo-api/model"
-	db "example/todo-api/model"
+	model "example/todo-api/internal/models"
 	"net/http"
 	"strconv"
 
@@ -32,7 +31,7 @@ func (tc *TodoController) GetTodos(c *gin.Context) {
 }
 
 func (tc *TodoController) CreateTodos(c *gin.Context) {
-	var todo db.TodoModel
+	var todo model.TodoModel
 
 	if err := c.ShouldBindJSON(&todo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
