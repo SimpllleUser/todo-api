@@ -18,6 +18,19 @@ func NewAuthController(aService *service.AuthService) *AuthController {
 	}
 }
 
+// Login godoc
+//
+//	@Summary		Login user
+//	@Description	Login user
+//	@Tags			Auth
+//	@Param			user	body	model.AuthInput	true	"User data"
+//	@Produce		json
+//	@accept			json
+//	@Success		200	{object}	model.AuthResponse
+//	@Failure		400	{object}	model.HTTPError	"Invalid request"
+//	@Failure		401	{object}	model.HTTPError	"Error authenticating user"
+//	@Failure		500	{object}	model.HTTPError	"Could not generate token"
+//	@Router			/auth/login [post]
 func (ac *AuthController) Login(c *gin.Context) {
 	var authInput model.AuthInput
 

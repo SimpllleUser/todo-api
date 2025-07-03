@@ -1,5 +1,20 @@
 basePath: /api/v1
 definitions:
+  model.AuthInput:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  model.AuthResponse:
+    properties:
+      token:
+        type: string
+    type: object
   model.BooleanResponse:
     properties:
       data:
@@ -37,6 +52,30 @@ definitions:
         example: Buy groceries
         type: string
     type: object
+  model.UserCreateRequest:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/model.UserModel'
+    required:
+    - token
+    type: object
+  model.UserModel:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      updatedAt:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -44,6 +83,70 @@ info:
   title: TODO API2
   version: 0.0.1
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.AuthInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AuthResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "401":
+          description: Error authenticating user
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Could not generate token
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: Login user
+      tags:
+      - Auth
+  /auth/registration:
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.AuthInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserCreateRequest'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: Create user
+      tags:
+      - Auth
   /todos:
     get:
       description: get todos
@@ -56,6 +159,10 @@ paths:
             items:
               $ref: '#/definitions/model.TodoModel'
             type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
       summary: Get all todos
       tags:
       - Todos

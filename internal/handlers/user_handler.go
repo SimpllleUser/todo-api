@@ -28,7 +28,7 @@ var errorBody = gin.H{"error": "Internal server error"}
 //
 //	@Summary		Create user
 //	@Description	Create user
-//	@Tags			User
+//	@Tags			Auth
 //	@Param			user	body	model.AuthInput	true	"User data"
 //	@Produce		json
 //	@accept			json
@@ -36,7 +36,6 @@ var errorBody = gin.H{"error": "Internal server error"}
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/auth/registration [post]
-
 func (uc *UserController) CreateUser(c *gin.Context) {
 
 	var authInput model.AuthInput
