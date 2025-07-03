@@ -28,6 +28,8 @@ func NewTodoController(tService *service.TodoService) *TodoController {
 //	@Success		200	{array}		model.TodoModel
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/todos [get]
+//
+// @Security BearerAuth
 func (tc *TodoController) GetTodos(c *gin.Context) {
 	todos, err := tc.todoService.GetAll()
 	if err != nil {
@@ -52,6 +54,8 @@ func (tc *TodoController) GetTodos(c *gin.Context) {
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/todos [post]
+//
+// @Security BearerAuth
 func (tc *TodoController) CreateTodos(c *gin.Context) {
 	var todo model.TodoCreateRequest
 
@@ -83,6 +87,8 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/todos/:id [get]
+//
+// @Security BearerAuth
 func (tc *TodoController) GetTodoById(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 
@@ -115,6 +121,8 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/todos/title/:title [get]
+//
+// @Security BearerAuth
 func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 	println(c.Params)
 	title := c.Param("title")
@@ -149,6 +157,8 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/todos [put]
+//
+// @Security BearerAuth
 func (tc *TodoController) UpdateTodo(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -192,6 +202,8 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/todos/:id [delete]
+//
+// @Security BearerAuth
 func (tc *TodoController) DeleteTodo(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 

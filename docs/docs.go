@@ -115,6 +115,11 @@ const docTemplate = `{
         },
         "/todos": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get todos",
                 "produces": [
                     "application/json"
@@ -470,7 +475,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "Type \"Bearer\" followed by a space and JWT token.n",
+            "description": "Enter your token **with** Bearer prefix, e.g. ` + "`" + `Bearer \u003ctoken\u003e` + "`" + `",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

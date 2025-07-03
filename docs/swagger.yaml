@@ -163,6 +163,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.HTTPError'
+      security:
+      - BearerAuth: []
       summary: Get all todos
       tags:
       - Todos
@@ -306,7 +308,7 @@ paths:
       - Todos
 securityDefinitions:
   BearerAuth:
-    description: Type "Bearer" followed by a space and JWT token.n
+    description: Enter your token **with** Bearer prefix, e.g. `Bearer <token>`
     in: header
     name: Authorization
     type: apiKey
