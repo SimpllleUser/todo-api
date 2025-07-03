@@ -10,6 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @title Example TODO API
+// @version 1.0
+// @description This is a simple API
+// @host localhost:8080
+// @BasePath /api/v1
+
 func main() {
 
 	config.LoadEnv()

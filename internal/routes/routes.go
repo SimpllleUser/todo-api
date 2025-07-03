@@ -1,12 +1,21 @@
 package routes
 
 import (
+	_ "example/todo-api/docs"
 	handler "example/todo-api/internal/handlers"
 	"example/todo-api/internal/middlewares"
 	service "example/todo-api/internal/services"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+//	@title			My API
+//	@version		1.0
+//	@description	This is a sample REST API server.
+//	@host			localhost:8080
+//	@BasePath		/api/v1
 
 func SetupRoutes(r *gin.Engine,
 	todoHandler *handler.TodoController,
@@ -33,5 +42,7 @@ func SetupRoutes(r *gin.Engine,
 			auth.POST("/registration", userHandler.CreateUser)
 		}
 	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 }

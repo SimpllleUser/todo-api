@@ -19,6 +19,14 @@ func NewTodoController(tService *service.TodoService) *TodoController {
 	}
 }
 
+// GetTodos godoc
+//
+//	@Summary		Get all todos
+//	@Description	get todos
+//	@Tags			Todos
+//	@Produce		json
+//	@Success		200	{array}	model.TodoModel
+//	@Router			/todos [get]
 func (tc *TodoController) GetTodos(c *gin.Context) {
 	todos, err := tc.todoService.GetAll()
 	if err != nil {
@@ -50,6 +58,10 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 		"data": todo,
 	})
 }
+
+// GetTodoById godoc
+//	@Success	200	{object}	map[string]model.TodoModel
+//	@Failure	400	{object}	model.HTTPError
 
 func (tc *TodoController) GetTodoById(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)

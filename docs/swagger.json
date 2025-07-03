@@ -1,0 +1,59 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a simple API",
+        "title": "Example TODO API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/todos": {
+            "get": {
+                "description": "get todos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Get all todos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.TodoModel"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.TodoModel": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Milk, eggs, bread"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
+                }
+            }
+        }
+    }
+}

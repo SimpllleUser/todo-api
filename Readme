@@ -1,1 +1,2 @@
-.
+# RUN go run ./cmd
+# GENERATE DOCS  swag init -g ./cmd/main.go
