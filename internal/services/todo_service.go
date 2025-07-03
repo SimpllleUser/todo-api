@@ -14,8 +14,13 @@ func NewTodoService(db *gorm.DB) *TodoService {
 	return &TodoService{db: db}
 }
 
-func (t *TodoService) Create(todo *model.TodoModel) error {
-	return t.db.Create(todo).Error
+func (t *TodoService) Create(todo *model.TodoCreateRequest) error {
+	var todoModel = &model.TodoModel{
+		Title:       todo.Title,
+		Description: todo.Description,
+		Completed:   todo.Completed,
+	}
+	return t.db.Create(todoModel).Error
 }
 
 func (t *TodoService) GetById(id uint) (*model.TodoModel, error) {

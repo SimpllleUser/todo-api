@@ -39,8 +39,20 @@ func (tc *TodoController) GetTodos(c *gin.Context) {
 	})
 }
 
+// CreateTodos godoc
+//
+//	@Summary		Create todo
+//	@Description	Create todo
+//	@Tags			Todos
+//	@Param			todo	body	model.TodoCreateRequest	true	"Todo data"
+//	@Produce		json
+//	@accept			json
+//	@Success		200	{object}	model.TodoModel
+//	@Failure		400	{object}	model.HTTPError	"Invalid request"
+//	@Failure		500	{object}	model.HTTPError	"Internal server error"
+//	@Router			/todos [post]
 func (tc *TodoController) CreateTodos(c *gin.Context) {
-	var todo model.TodoModel
+	var todo model.TodoCreateRequest
 
 	if err := c.ShouldBindJSON(&todo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -60,9 +72,16 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 }
 
 // GetTodoById godoc
-//	@Success	200	{object}	map[string]model.TodoModel
-//	@Failure	400	{object}	model.HTTPError
-
+//
+//	@Summary		Get todo by id
+//	@Description	get todo by id
+//	@Param			id	path	int	true	"Todo ID"
+//	@Tags			Todos
+//	@Produce		json
+//	@Success		302	{object}	model.TodoModel
+//	@Failure		400	{object}	model.HTTPError	"Invalid request"
+//	@Failure		500	{object}	model.HTTPError	"Internal server error"
+//	@Router			/todos/:id [get]
 func (tc *TodoController) GetTodoById(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 
@@ -84,6 +103,17 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 	})
 }
 
+// GetTodoByTitle godoc
+//
+//	@Summary		Get todo by title
+//	@Description	get todo by title
+//	@Param			title	path	string	true	"Todo title"
+//	@Tags			Todos
+//	@Produce		json
+//	@Success		200	{object}	model.TodoModel
+//	@Failure		400	{object}	model.HTTPError	"Invalid request"
+//	@Failure		500	{object}	model.HTTPError	"Internal server error"
+//	@Router			/todos/title/:title [get]
 func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 	println(c.Params)
 	title := c.Param("title")
@@ -106,6 +136,18 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 	})
 }
 
+// UpdateTodo godoc
+//
+//	@Summary		Update todo
+//	@Description	update todo
+//	@Tags			Todos
+//	@Param			todo	body	model.TodoModel	true	"Todo data"
+//	@Produce		json
+//	@accept			json
+//	@Success		200	{object}	model.TodoModel
+//	@Failure		400	{object}	model.HTTPError	"Invalid request"
+//	@Failure		500	{object}	model.HTTPError	"Internal server error"
+//	@Router			/todos [put]
 func (tc *TodoController) UpdateTodo(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -138,6 +180,17 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 	})
 }
 
+// DeleteTodo godoc
+//
+//	@Summary		Delete todo by id
+//	@Description	delete todo by id
+//	@Param			id	path	int	true	"Todo ID"
+//	@Tags			Todos
+//	@Produce		json
+//	@Success		200	{object}	model.BooleanResponse
+//	@Failure		400	{object}	model.HTTPError	"Invalid request"
+//	@Failure		500	{object}	model.HTTPError	"Internal server error"
+//	@Router			/todos/:id [delete]
 func (tc *TodoController) DeleteTodo(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 

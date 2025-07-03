@@ -7,6 +7,12 @@ type TodoModel struct {
 	Completed   bool   `gorm:"default:false" json:"completed" example:"false"`
 }
 
+type TodoCreateRequest struct {
+	Title       string `gorm:"not null" json:"title" example:"Buy groceries"`
+	Description string `gorm:"null" json:"description" example:"Milk, eggs, bread"`
+	Completed   bool   `gorm:"default:false" json:"completed" example:"false"`
+}
+
 func (TodoModel) TableName() string {
 	return "todos"
 }

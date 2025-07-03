@@ -1,5 +1,27 @@
 basePath: /api/v1
 definitions:
+  model.BooleanResponse:
+    properties:
+      data:
+        type: boolean
+    type: object
+  model.HTTPError:
+    properties:
+      error:
+        type: string
+    type: object
+  model.TodoCreateRequest:
+    properties:
+      completed:
+        example: false
+        type: boolean
+      description:
+        example: Milk, eggs, bread
+        type: string
+      title:
+        example: Buy groceries
+        type: string
+    type: object
   model.TodoModel:
     properties:
       completed:
@@ -35,6 +57,144 @@ paths:
               $ref: '#/definitions/model.TodoModel'
             type: array
       summary: Get all todos
+      tags:
+      - Todos
+    post:
+      consumes:
+      - application/json
+      description: Create todo
+      parameters:
+      - description: Todo data
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/model.TodoCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TodoModel'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: Create todo
+      tags:
+      - Todos
+    put:
+      consumes:
+      - application/json
+      description: update todo
+      parameters:
+      - description: Todo data
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/model.TodoModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TodoModel'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: Update todo
+      tags:
+      - Todos
+  /todos/:id:
+    delete:
+      description: delete todo by id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BooleanResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: Delete todo by id
+      tags:
+      - Todos
+    get:
+      description: get todo by id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Found
+          schema:
+            $ref: '#/definitions/model.TodoModel'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: Get todo by id
+      tags:
+      - Todos
+  /todos/title/:title:
+    get:
+      description: get todo by title
+      parameters:
+      - description: Todo title
+        in: path
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TodoModel'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: Get todo by title
       tags:
       - Todos
 securityDefinitions:
