@@ -1,10 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a simple API",
-        "title": "Example TODO API",
+        "description": "This is a simple API for managing TODOs.",
+        "title": "TODO API2",
         "contact": {},
-        "version": "1.0"
+        "version": "0.0.1"
     },
     "host": "localhost:8080",
     "basePath": "/api/v1",
@@ -54,6 +54,14 @@
                     "example": "Buy groceries"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.n",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

@@ -10,11 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @title Example TODO API
-// @version 1.0
-// @description This is a simple API
+// @title  TODO API2
+// @version 0.0.1
+// @description This is a simple API for managing TODOs.
 // @host localhost:8080
 // @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.n
 
 func main() {
 

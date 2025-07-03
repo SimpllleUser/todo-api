@@ -18,9 +18,9 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: This is a simple API
-  title: Example TODO API
-  version: "1.0"
+  description: This is a simple API for managing TODOs.
+  title: TODO API2
+  version: 0.0.1
 paths:
   /todos:
     get:
@@ -37,4 +37,10 @@ paths:
       summary: Get all todos
       tags:
       - Todos
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.n
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
