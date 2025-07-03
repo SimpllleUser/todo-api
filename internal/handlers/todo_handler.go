@@ -26,6 +26,7 @@ func NewTodoController(tService *service.TodoService) *TodoController {
 //	@Tags			Todos
 //	@Produce		json
 //	@Success		200	{array}	model.TodoModel
+//	@Failure		500	{object}	model.HTTPError	"Internal server error"
 //	@Router			/todos [get]
 func (tc *TodoController) GetTodos(c *gin.Context) {
 	todos, err := tc.todoService.GetAll()

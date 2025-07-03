@@ -24,6 +24,19 @@ func NewUserController(uService *service.UserService, aService *service.AuthServ
 
 var errorBody = gin.H{"error": "Internal server error"}
 
+// CreateUser godoc
+//
+//	@Summary		Create user
+//	@Description	Create user
+//	@Tags			User
+//	@Param			user	body	model.AuthInput	true	"User data"
+//	@Produce		json
+//	@accept			json
+//	@Success		200	{object}	model.UserCreateRequest
+//	@Failure		400	{object}	model.HTTPError	"Invalid request"
+//	@Failure		500	{object}	model.HTTPError	"Internal server error"
+//	@Router			/auth/registration [post]
+
 func (uc *UserController) CreateUser(c *gin.Context) {
 
 	var authInput model.AuthInput

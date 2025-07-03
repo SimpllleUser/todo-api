@@ -16,3 +16,8 @@ type UserModel struct {
 func (UserModel) TableName() string {
 	return "users"
 }
+
+type UserCreateRequest struct {
+	User  UserModel `json:"user"`
+	Token string    `json:"token" binding:"required"`
+}
