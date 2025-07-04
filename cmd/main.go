@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//	@title						TODO API2
+//	@title						TODO API
 //	@version					0.0.1
 //	@description				This is a simple API for managing TODOs.
 //	@host						localhost:8080

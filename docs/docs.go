@@ -147,6 +147,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "update todo",
                 "consumes": [
                     "application/json"
@@ -191,6 +196,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create todo",
                 "consumes": [
                     "application/json"
@@ -237,6 +247,11 @@ const docTemplate = `{
         },
         "/todos/:id": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get todo by id",
                 "produces": [
                     "application/json"
@@ -276,6 +291,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "delete todo by id",
                 "produces": [
                     "application/json"
@@ -317,6 +337,11 @@ const docTemplate = `{
         },
         "/todos/title/:title": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get todo by title",
                 "produces": [
                     "application/json"
@@ -489,7 +514,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "TODO API2",
+	Title:            "TODO API",
 	Description:      "This is a simple API for managing TODOs.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
