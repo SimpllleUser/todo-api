@@ -1,2 +1,3 @@
 # RUN go run ./cmd
+# RUN with hot reload ./cmd
 # GENERATE DOCS  swag init -g ./cmd/main.go
