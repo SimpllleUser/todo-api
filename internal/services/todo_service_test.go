@@ -118,7 +118,7 @@ func TestUpdateTodo(t *testing.T) {
 
 	updateTodo := &model.TodoModel{
 		ID:          1,
-		Title:       "",
+		Title:       "Test item todo title updated",
 		Description: "Test item todo description updated",
 		Completed:   true,
 	}
@@ -133,4 +133,67 @@ func TestUpdateTodo(t *testing.T) {
 	assert.Equal(t, updateTodo.Description, result.Description)
 	assert.Equal(t, updateTodo.Completed, result.Completed)
 
+}
+
+func TestValidationUpdateTodo(t *testing.T) {
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	tests := []struct {
+		name           string
+		todo           *model.TodoModel
+		validationRule string
+		wantErr        bool
+	}{
+		{
+			name: "Valid todo title",
+			todo: &model.TodoModel{
+				ID:    1,
+				Title: "Todo valid title",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Empty todo title",
+			todo: &model.TodoModel{
+				ID:    1,
+				Title: "",
+			},
+			validationRule: "required",
+			wantErr:        true,
+		},
+		{
+			name: "Min lens todo title",
+			todo: &model.TodoModel{
+				ID:    1,
+				Title: "Ab",
+			},
+			validationRule: "minLen",
+			wantErr:        true,
+		},
+		{
+			name: "Trim todo title",
+			todo: &model.TodoModel{
+				ID:    1,
+				Title: "   ",
+			},
+			validationRule: "required",
+			wantErr:        true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := todoService.Update(tt.todo)
+			if tt.wantErr {
+				if tt.validationRule == "" {
+					t.Fatalf("validationRule must be specified for test case: %s", tt.name)
+				}
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.validationRule)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
 }

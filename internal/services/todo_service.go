@@ -29,6 +29,14 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) error {
 	return t.db.Create(todoModel).Error
 }
 
+func (t *TodoService) Update(todo *model.TodoModel) error {
+	v := validate.Struct(todo)
+	if !v.Validate() {
+		return fmt.Errorf("validation failed: %v", v.Errors)
+	}
+	return t.db.Save(todo).Error
+}
+
 func (t *TodoService) GetById(id uint) (*model.TodoModel, error) {
 	var todo *model.TodoModel
 	err := t.db.Find(&todo, id).Error
@@ -46,10 +54,6 @@ func (t *TodoService) GetAll() ([]*model.TodoModel, error) {
 
 	err := t.db.Find(&todos).Error
 	return todos, err
-}
-
-func (t *TodoService) Update(todo *model.TodoModel) error {
-	return t.db.Save(todo).Error
 }
 
 func (t *TodoService) Delete(id uint) error {
