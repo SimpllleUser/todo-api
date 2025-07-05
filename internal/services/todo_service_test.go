@@ -46,20 +46,61 @@ func TestCreateTodo(t *testing.T) {
 }
 
 func TestValidationCreateTodo(t *testing.T) {
-	// ctx := context.Background()
 	db := setupTestDB(t)
 	todoService := NewTodoService(db)
 
-	todo := &model.TodoCreateRequest{
-		Title:       " 12",
-		Description: "Test description",
+	tests := []struct {
+		name           string
+		todo           *model.TodoCreateRequest
+		validationRule string
+		wantErr        bool
+	}{
+		{
+			name: "Valid todo title",
+			todo: &model.TodoCreateRequest{
+				Title: "Todo valid title",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Empty todo title",
+			todo: &model.TodoCreateRequest{
+				Title: "",
+			},
+			validationRule: "required",
+			wantErr:        true,
+		},
+		{
+			name: "Min lens todo title",
+			todo: &model.TodoCreateRequest{
+				Title: "Ab",
+			},
+			validationRule: "minLen",
+			wantErr:        true,
+		},
+		{
+			name: "Trim todo title",
+			todo: &model.TodoCreateRequest{
+				Title: "   ",
+			},
+			validationRule: "required",
+			wantErr:        true,
+		},
 	}
 
-	err := todoService.Create(todo)
-
-	require.Error(t, err)
-
-	// assert.Contains(t, err.Error(), "required")
-	assert.Contains(t, err.Error(), "validation failed: minLen: Title min length is 3") // конкр
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := todoService.Create(tt.todo)
+			if tt.wantErr {
+				if tt.validationRule == "" {
+					t.Fatalf("validationRule must be specified for test case: %s", tt.name)
+				}
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.validationRule)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
 
 }
