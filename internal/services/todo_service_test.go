@@ -105,7 +105,6 @@ func TestValidationCreateTodo(t *testing.T) {
 }
 
 func TestUpdateTodo(t *testing.T) {
-	// ctx := context.Background()
 	db := setupTestDB(t)
 	todoService := NewTodoService(db)
 
@@ -119,7 +118,7 @@ func TestUpdateTodo(t *testing.T) {
 
 	updateTodo := &model.TodoModel{
 		ID:          1,
-		Title:       "Test item todo title updated",
+		Title:       "",
 		Description: "Test item todo description updated",
 		Completed:   true,
 	}
@@ -133,14 +132,5 @@ func TestUpdateTodo(t *testing.T) {
 	assert.Equal(t, updateTodo.Title, result.Title)
 	assert.Equal(t, updateTodo.Description, result.Description)
 	assert.Equal(t, updateTodo.Completed, result.Completed)
-
-	// var result model.TodoModel
-	// err = db.WithContext(ctx).First(&result, "title = ?", "Test title").Error
-
-	// require.NoError(t, err)
-
-	// assert.Equal(t, "Test title", result.Title)
-	// assert.Equal(t, "Test description", result.Description)
-	// assert.False(t, result.Completed)
 
 }
