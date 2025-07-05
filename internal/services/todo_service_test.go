@@ -44,3 +44,22 @@ func TestCreateTodo(t *testing.T) {
 	assert.False(t, result.Completed)
 
 }
+
+func TestValidationCreateTodo(t *testing.T) {
+	// ctx := context.Background()
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	todo := &model.TodoCreateRequest{
+		Title:       " 12",
+		Description: "Test description",
+	}
+
+	err := todoService.Create(todo)
+
+	require.Error(t, err)
+
+	// assert.Contains(t, err.Error(), "required")
+	assert.Contains(t, err.Error(), "validation failed: minLen: Title min length is 3") // конкр
+
+}

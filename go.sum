@@ -64,6 +64,12 @@ github.com/golang-jwt/jwt v3.2.2+incompatible/go.mod h1:8pz2t5EyA70fFQQSrl6XZXzq
 github.com/golang-jwt/jwt/v4 v4.5.2 h1:YtQM7lnr8iZ+j5q71MGKkNw9Mn7AjHM68uc9g5fXeUI=
 github.com/golang-jwt/jwt/v4 v4.5.2/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1cv77w39/MY0Ch0=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
+github.com/gookit/filter v1.2.2 h1:LSBQLk4M4fpfhaOG0hJ/GJ+qu+2+lLddgxlGfzcd8VQ=
+github.com/gookit/filter v1.2.2/go.mod h1:y4xpiqM/fV9g9yT/Vg5OWUq4q9siPj0UlH9O57xYuGs=
+github.com/gookit/goutil v0.6.18 h1:MUVj0G16flubWT8zYVicIuisUiHdgirPAkmnfD2kKgw=
+github.com/gookit/goutil v0.6.18/go.mod h1:AY/5sAwKe7Xck+mEbuxj0n/bc3qwrGNe3Oeulln7zBA=
+github.com/gookit/validate v1.5.5 h1:jzMrwAYy9tbQa0mH8YFnv3C3JQR/0N4pRTsYiySwRJM=
+github.com/gookit/validate v1.5.5/go.mod h1:p9sRPfpvYB4vXICBpEPzv8FoAky+XhUOhWQghgmmat4=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=

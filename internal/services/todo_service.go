@@ -2,7 +2,9 @@ package service
 
 import (
 	model "example/todo-api/internal/models"
+	"fmt"
 
+	"github.com/gookit/validate"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +21,10 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) error {
 		Title:       todo.Title,
 		Description: todo.Description,
 		Completed:   todo.Completed,
+	}
+	v := validate.Struct(todo)
+	if !v.Validate() {
+		return fmt.Errorf("validation failed: %v", v.Errors)
 	}
 	return t.db.Create(todoModel).Error
 }

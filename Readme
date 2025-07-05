@@ -1,2 +1,17 @@
-# RUN go run ./cmd
-# GENERATE DOCS  swag init -g ./cmd/main.go
+# RUN
+
+```
+    go run ./cmd
+```
+
+# GENERATE DOCS
+
+```
+    swag init -g ./cmd/main.go
+```
+
+Run test
+
+```
+    go test -v ./internal/services
+```
