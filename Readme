@@ -15,3 +15,9 @@ Run test
 ```
     go test -v ./internal/services
 ```
+
+Run test coverage
+
+```
+    go test -coverprofile=coverage.out ./...
+```
