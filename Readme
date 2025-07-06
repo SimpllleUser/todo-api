@@ -1,23 +1,29 @@
-# RUN
+# Run
 
-```
+```bash
     go run ./cmd
 ```
 
-# GENERATE DOCS
+# Generate docs
 
-```
+```bash
     swag init -g ./cmd/main.go
 ```
 
-Run test
+#Run test
 
-```
+```bash
     go test -v ./internal/services
 ```
 
-Run test coverage
+# Run test coverage
 
-```
+```bash
     go test -coverprofile=coverage.out ./...
+```
+
+# Run show coverage in html
+
+```bash
+    go tool cover -html=coverage.out -o coverage.html
 ```

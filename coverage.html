@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>services: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">example/todo-api/internal/services/auth_service.go (0.0%)</option>
+				
+				<option value="file1">example/todo-api/internal/services/todo_service.go (50.0%)</option>
+				
+				<option value="file2">example/todo-api/internal/services/user_service.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package service
+
+import (
+        model "example/todo-api/internal/models"
+        "log"
+        "os"
+        "time"
+
+        "github.com/golang-jwt/jwt"
+        "golang.org/x/crypto/bcrypt"
+)
+
+type AuthService struct {
+        userService *UserService
+}
+
+const EXPIRE = time.Hour * 24
+
+func NewAuthService(us *UserService) *AuthService <span class="cov0" title="0">{
+        return &amp;AuthService{
+                userService: us,
+        }
+}</span>
+
+func (as *AuthService) Authenticate(login string, password string) (*model.UserModel, error) <span class="cov0" title="0">{
+        var userFound, err = as.userService.FindByLogin(login)
+
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("Error find user by login", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := compareHashAndPassword([]byte(userFound.Password), []byte(password)); err != nil </span><span class="cov0" title="0">{
+                log.Println("Error comparing password:", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return userFound, nil</span>
+}
+
+func (as *AuthService) GenerateToken(userId uint) (string, error) <span class="cov0" title="0">{
+
+        generateToken := getClaim(jwt.MapClaims{
+                "id":  userId,
+                "exp": time.Now().Add(EXPIRE).Unix(),
+        })
+
+        token, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
+
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("Could not generate token", err)
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">return token, nil</span>
+}
+
+func compareHashAndPassword(userPassword []byte, inputPassword []byte) error <span class="cov0" title="0">{
+        if len(userPassword) == 0 || len(inputPassword) == 0 </span><span class="cov0" title="0">{
+                return bcrypt.ErrMismatchedHashAndPassword
+        }</span>
+        <span class="cov0" title="0">return bcrypt.CompareHashAndPassword(userPassword, inputPassword)</span>
+}
+
+func getClaim(claims jwt.Claims) *jwt.Token <span class="cov0" title="0">{
+        return jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package service
+
+import (
+        model "example/todo-api/internal/models"
+        "fmt"
+
+        "github.com/gookit/validate"
+        "gorm.io/gorm"
+)
+
+type TodoService struct {
+        db *gorm.DB
+}
+
+func NewTodoService(db *gorm.DB) *TodoService <span class="cov8" title="1">{
+        return &amp;TodoService{db: db}
+}</span>
+
+func (t *TodoService) Create(todo *model.TodoCreateRequest) error <span class="cov8" title="1">{
+        var todoModel = &amp;model.TodoModel{
+                Title:       todo.Title,
+                Description: todo.Description,
+                Completed:   todo.Completed,
+        }
+        v := validate.Struct(todo)
+        if !v.Validate() </span><span class="cov8" title="1">{
+                return fmt.Errorf("validation failed: %v", v.Errors)
+        }</span>
+        <span class="cov8" title="1">return t.db.Create(todoModel).Error</span>
+}
+
+func (t *TodoService) Update(todo *model.TodoModel) error <span class="cov8" title="1">{
+        v := validate.Struct(todo)
+        if !v.Validate() </span><span class="cov8" title="1">{
+                return fmt.Errorf("validation failed: %v", v.Errors)
+        }</span>
+        <span class="cov8" title="1">return t.db.Save(todo).Error</span>
+}
+
+func (t *TodoService) GetById(id uint) (*model.TodoModel, error) <span class="cov0" title="0">{
+        var todo *model.TodoModel
+        err := t.db.Find(&amp;todo, id).Error
+        return todo, err
+}</span>
+
+func (t *TodoService) GetByTitle(title string) (*[]*model.TodoModel, error) <span class="cov0" title="0">{
+        var todos []*model.TodoModel
+        err := t.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&amp;todos).Error
+        return &amp;todos, err
+}</span>
+
+func (t *TodoService) GetAll() ([]*model.TodoModel, error) <span class="cov0" title="0">{
+        var todos = []*model.TodoModel{}
+
+        err := t.db.Find(&amp;todos).Error
+        return todos, err
+}</span>
+
+func (t *TodoService) Delete(id uint) error <span class="cov0" title="0">{
+        return t.db.Delete(&amp;model.TodoModel{}, id).Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package service
+
+import (
+        model "example/todo-api/internal/models"
+
+        "gorm.io/gorm"
+)
+
+type UserService struct {
+        db *gorm.DB
+}
+
+func NewUserService(db *gorm.DB) *UserService <span class="cov0" title="0">{
+        return &amp;UserService{db: db}
+}</span>
+
+func (u *UserService) FindById(id uint) (*model.UserModel, error) <span class="cov0" title="0">{
+        var user model.UserModel
+        err := u.db.Find(&amp;user, id).Error
+        return &amp;user, err
+}</span>
+
+func (u *UserService) FindByName(name string) (*model.UserModel, error) <span class="cov0" title="0">{
+        var user model.UserModel
+        err := u.db.Where("name = ?", name).First(&amp;user).Error
+        return &amp;user, err
+}</span>
+
+func (u *UserService) FindByLogin(login string) (*model.UserModel, error) <span class="cov0" title="0">{
+        var user model.UserModel
+        err := u.db.Where("login = ?", login).First(&amp;user).Error
+        return &amp;user, err
+}</span>
+
+func (u *UserService) Create(user *model.UserModel) error <span class="cov0" title="0">{
+        err := u.db.Create(&amp;user).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

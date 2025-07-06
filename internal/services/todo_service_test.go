@@ -21,7 +21,17 @@ func setupTestDB(t *testing.T) *gorm.DB {
 	return db
 }
 
+func cleanupDB(t *testing.T, db *gorm.DB) {
+	t.Helper()
+	err := db.Exec("DELETE FROM todos").Error
+	require.NoError(t, err)
+
+	err = db.Exec("DELETE FROM users").Error
+	require.NoError(t, err)
+}
+
 func TestCreateTodo(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	db := setupTestDB(t)
 	todoService := NewTodoService(db)
@@ -43,9 +53,12 @@ func TestCreateTodo(t *testing.T) {
 	assert.Equal(t, "Test description", result.Description)
 	assert.False(t, result.Completed)
 
+	cleanupDB(t, db)
+
 }
 
 func TestValidationCreateTodo(t *testing.T) {
+	t.Parallel()
 	db := setupTestDB(t)
 	todoService := NewTodoService(db)
 
@@ -102,9 +115,12 @@ func TestValidationCreateTodo(t *testing.T) {
 			}
 		})
 	}
+	cleanupDB(t, db)
 }
 
 func TestUpdateTodo(t *testing.T) {
+	t.Parallel()
+
 	db := setupTestDB(t)
 	todoService := NewTodoService(db)
 
@@ -133,9 +149,11 @@ func TestUpdateTodo(t *testing.T) {
 	assert.Equal(t, updateTodo.Description, result.Description)
 	assert.Equal(t, updateTodo.Completed, result.Completed)
 
+	cleanupDB(t, db)
 }
 
 func TestValidationUpdateTodo(t *testing.T) {
+
 	db := setupTestDB(t)
 	todoService := NewTodoService(db)
 
@@ -196,4 +214,6 @@ func TestValidationUpdateTodo(t *testing.T) {
 			}
 		})
 	}
+
+	cleanupDB(t, db)
 }
