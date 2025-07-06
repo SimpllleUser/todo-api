@@ -19,16 +19,14 @@ func setupTestDB(t *testing.T) *gorm.DB {
 	err = db.AutoMigrate(&model.TodoModel{}, &model.UserModel{})
 	require.NoError(t, err)
 
+	t.Cleanup(func() {
+		err := db.Exec("DELETE FROM todos").Error
+		require.NoError(t, err)
+
+		err = db.Exec("DELETE FROM users").Error
+		require.NoError(t, err)
+	})
 	return db
-}
-
-func cleanupDB(t *testing.T, db *gorm.DB) {
-	t.Helper()
-	err := db.Exec("DELETE FROM todos").Error
-	require.NoError(t, err)
-
-	err = db.Exec("DELETE FROM users").Error
-	require.NoError(t, err)
 }
 
 func seedTodos(t *testing.T, service *TodoService, count int) []model.TodoModel {
@@ -77,8 +75,6 @@ func TestCreateTodo(t *testing.T) {
 	assert.Equal(t, createdTodo.Title, result.Title)
 	assert.Equal(t, createdTodo.Description, result.Description)
 	assert.False(t, result.Completed)
-
-	cleanupDB(t, db)
 
 }
 
@@ -140,7 +136,7 @@ func TestValidationCreateTodo(t *testing.T) {
 			}
 		})
 	}
-	cleanupDB(t, db)
+
 }
 
 func TestUpdateTodo(t *testing.T) {
@@ -154,11 +150,11 @@ func TestUpdateTodo(t *testing.T) {
 		Description: "Test item todo description",
 	}
 
-	_, err := todoService.Create(todo)
+	createdTodo, err := todoService.Create(todo)
 	require.NoError(t, err)
 
 	updateTodo := &model.TodoModel{
-		ID:          1,
+		ID:          createdTodo.ID,
 		Title:       "Test item todo title updated",
 		Description: "Test item todo description updated",
 		Completed:   true,
@@ -174,7 +170,6 @@ func TestUpdateTodo(t *testing.T) {
 	assert.Equal(t, updateTodo.Description, result.Description)
 	assert.Equal(t, updateTodo.Completed, result.Completed)
 
-	cleanupDB(t, db)
 }
 
 func TestValidationUpdateTodo(t *testing.T) {
@@ -227,6 +222,7 @@ func TestValidationUpdateTodo(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			err := todoService.Update(tt.todo)
 			if tt.wantErr {
 				if tt.validationRule == "" {
@@ -240,7 +236,6 @@ func TestValidationUpdateTodo(t *testing.T) {
 		})
 	}
 
-	cleanupDB(t, db)
 }
 
 func TestFindByIdTodo(t *testing.T) {
@@ -265,8 +260,6 @@ func TestFindByIdTodo(t *testing.T) {
 	assert.Equal(t, todo.Description, found.Description)
 	assert.Equal(t, todo.Completed, found.Completed)
 
-	cleanupDB(t, db)
-
 }
 
 func TestFindByTitleOneMoreTodos(t *testing.T) {
@@ -280,11 +273,10 @@ func TestFindByTitleOneMoreTodos(t *testing.T) {
 	foundTodos, err := todoService.GetByTitle("Todo")
 
 	assert.Equal(t, foundTodos, todoFromList)
-	assert.Equal(t, len(foundTodos), 2)
+	assert.Len(t, foundTodos, 2)
 
 	require.NoError(t, err)
 
-	cleanupDB(t, db)
 }
 
 func TestFindByTitleTodos(t *testing.T) {
@@ -301,7 +293,6 @@ func TestFindByTitleTodos(t *testing.T) {
 
 	require.NoError(t, err)
 
-	cleanupDB(t, db)
 }
 
 func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
@@ -312,11 +303,10 @@ func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
 
 	foundTodos, err := todoService.GetByTitle("Some test random text qwerty")
 
-	assert.Equal(t, len(foundTodos), 0)
+	assert.Len(t, foundTodos, 0)
 
 	require.NoError(t, err)
 
-	cleanupDB(t, db)
 }
 
 func TestGetAll(t *testing.T) {
@@ -327,7 +317,7 @@ func TestGetAll(t *testing.T) {
 
 	foundTodos, err := todoService.GetAll()
 
-	assert.Equal(t, len(foundTodos), 10)
+	assert.Len(t, foundTodos, 10)
 
 	for index, seededTodo := range seededTodos {
 		assert.Equal(t, seededTodo, *foundTodos[index])
@@ -335,7 +325,6 @@ func TestGetAll(t *testing.T) {
 
 	require.NoError(t, err)
 
-	cleanupDB(t, db)
 }
 
 func TestDelete(t *testing.T) {
@@ -353,9 +342,8 @@ func TestDelete(t *testing.T) {
 	todoListAfterRemove, err := todoService.GetAll()
 	require.NoError(t, err)
 
-	assert.Equal(t, len(todoListBeforeRemove)-1, len(todoListAfterRemove))
+	assert.Len(t, todoListAfterRemove, len(todoListBeforeRemove)-1)
 
-	cleanupDB(t, db)
 }
 
 func TestDeleteWithUnrealId(t *testing.T) {
@@ -375,7 +363,6 @@ func TestDeleteWithUnrealId(t *testing.T) {
 	todoListAfterRemove, err := todoService.GetAll()
 	require.NoError(t, err)
 
-	assert.Equal(t, len(todoListBeforeRemove), len(todoListAfterRemove))
+	assert.Len(t, todoListBeforeRemove, len(todoListAfterRemove))
 
-	cleanupDB(t, db)
 }
