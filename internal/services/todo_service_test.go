@@ -217,3 +217,33 @@ func TestValidationUpdateTodo(t *testing.T) {
 
 	cleanupDB(t, db)
 }
+
+func TestFindByIdTodo(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	todo := &model.TodoCreateRequest{
+		Title: "Test title",
+	}
+
+	err := todoService.Create(todo)
+	require.NoError(t, err)
+
+	found, err := todoService.GetById(1)
+
+	require.NoError(t, err)
+
+	assert.Equal(t, 1, found.ID)
+	assert.Equal(t, todo.Title, found.Title)
+	assert.Equal(t, todo.Description, found.Description)
+	assert.Equal(t, todo.Completed, found.Completed)
+
+	// assert.Equal(t, "Test title", result.Title)
+	// assert.Equal(t, "Test description", result.Description)
+	// assert.False(t, result.Completed)
+
+	cleanupDB(t, db)
+
+}
