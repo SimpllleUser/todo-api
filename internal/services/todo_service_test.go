@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	model "example/todo-api/internal/models"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,6 +31,30 @@ func cleanupDB(t *testing.T, db *gorm.DB) {
 	require.NoError(t, err)
 }
 
+func seedTodos(t *testing.T, service *TodoService, count int) []model.TodoModel {
+	todos := make([]model.TodoModel, 0, count)
+
+	for index := 0; index <= count; index++ {
+		todoReq := model.TodoCreateRequest{
+			Title:       fmt.Sprintf("Todo title #%d", index),
+			Description: fmt.Sprintf("Todo description #%d", index),
+		}
+
+		createdTodo, err := service.Create(&todoReq)
+		require.NoError(t, err)
+
+		todos = append(todos, model.TodoModel{
+			ID:          createdTodo.ID,
+			Title:       createdTodo.Title,
+			Description: createdTodo.Description,
+			Completed:   createdTodo.Completed,
+		})
+
+	}
+
+	return todos
+}
+
 func TestCreateTodo(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
@@ -41,7 +66,7 @@ func TestCreateTodo(t *testing.T) {
 		Description: "Test description",
 	}
 
-	err := todoService.Create(todo)
+	createdTodo, err := todoService.Create(todo)
 	require.NoError(t, err)
 
 	var result model.TodoModel
@@ -49,8 +74,8 @@ func TestCreateTodo(t *testing.T) {
 
 	require.NoError(t, err)
 
-	assert.Equal(t, "Test title", result.Title)
-	assert.Equal(t, "Test description", result.Description)
+	assert.Equal(t, createdTodo.Title, result.Title)
+	assert.Equal(t, createdTodo.Description, result.Description)
 	assert.False(t, result.Completed)
 
 	cleanupDB(t, db)
@@ -103,7 +128,7 @@ func TestValidationCreateTodo(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := todoService.Create(tt.todo)
+			_, err := todoService.Create(tt.todo)
 			if tt.wantErr {
 				if tt.validationRule == "" {
 					t.Fatalf("validationRule must be specified for test case: %s", tt.name)
@@ -129,7 +154,7 @@ func TestUpdateTodo(t *testing.T) {
 		Description: "Test item todo description",
 	}
 
-	err := todoService.Create(todo)
+	_, err := todoService.Create(todo)
 	require.NoError(t, err)
 
 	updateTodo := &model.TodoModel{
@@ -219,8 +244,6 @@ func TestValidationUpdateTodo(t *testing.T) {
 }
 
 func TestFindByIdTodo(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
 	db := setupTestDB(t)
 	todoService := NewTodoService(db)
 
@@ -228,22 +251,55 @@ func TestFindByIdTodo(t *testing.T) {
 		Title: "Test title",
 	}
 
-	err := todoService.Create(todo)
+	_, err := todoService.Create(todo)
 	require.NoError(t, err)
 
-	found, err := todoService.GetById(1)
+	const todoID = uint(1)
+
+	found, err := todoService.GetById(todoID)
 
 	require.NoError(t, err)
 
-	assert.Equal(t, 1, found.ID)
+	assert.Equal(t, todoID, found.ID)
 	assert.Equal(t, todo.Title, found.Title)
 	assert.Equal(t, todo.Description, found.Description)
 	assert.Equal(t, todo.Completed, found.Completed)
 
-	// assert.Equal(t, "Test title", result.Title)
-	// assert.Equal(t, "Test description", result.Description)
-	// assert.False(t, result.Completed)
-
 	cleanupDB(t, db)
 
+}
+
+func TestFindByTitleOneMoreTodos(t *testing.T) {
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	todos := seedTodos(t, todoService, 10)
+
+	todoFromList := todos[:2]
+
+	foundTodos, err := todoService.GetByTitle("Todo")
+
+	assert.Equal(t, foundTodos, todoFromList)
+	assert.Equal(t, len(foundTodos), 2)
+
+	require.NoError(t, err)
+
+	cleanupDB(t, db)
+}
+
+func TestFindByTitleTodos(t *testing.T) {
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	seedTodos := seedTodos(t, todoService, 10)
+
+	currentTodo := seedTodos[5]
+
+	foundTodos, err := todoService.GetByTitle("Todo title #5")
+
+	assert.Equal(t, foundTodos[0], currentTodo)
+
+	require.NoError(t, err)
+
+	cleanupDB(t, db)
 }

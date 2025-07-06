@@ -16,7 +16,7 @@ func NewTodoService(db *gorm.DB) *TodoService {
 	return &TodoService{db: db}
 }
 
-func (t *TodoService) Create(todo *model.TodoCreateRequest) error {
+func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, error) {
 	var todoModel = &model.TodoModel{
 		Title:       todo.Title,
 		Description: todo.Description,
@@ -24,9 +24,10 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) error {
 	}
 	v := validate.Struct(todo)
 	if !v.Validate() {
-		return fmt.Errorf("validation failed: %v", v.Errors)
+		return nil, fmt.Errorf("validation failed: %v", v.Errors)
 	}
-	return t.db.Create(todoModel).Error
+	t.db.Create(todoModel)
+	return todoModel, nil
 }
 
 func (t *TodoService) Update(todo *model.TodoModel) error {
@@ -43,10 +44,10 @@ func (t *TodoService) GetById(id uint) (*model.TodoModel, error) {
 	return todo, err
 }
 
-func (t *TodoService) GetByTitle(title string) (*[]*model.TodoModel, error) {
-	var todos []*model.TodoModel
+func (t *TodoService) GetByTitle(title string) ([]model.TodoModel, error) {
+	var todos []model.TodoModel
 	err := t.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&todos).Error
-	return &todos, err
+	return todos, err
 }
 
 func (t *TodoService) GetAll() ([]*model.TodoModel, error) {
