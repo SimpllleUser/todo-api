@@ -34,7 +34,7 @@ func cleanupDB(t *testing.T, db *gorm.DB) {
 func seedTodos(t *testing.T, service *TodoService, count int) []model.TodoModel {
 	todos := make([]model.TodoModel, 0, count)
 
-	for index := 0; index <= count; index++ {
+	for index := 0; index < count; index++ {
 		todoReq := model.TodoCreateRequest{
 			Title:       fmt.Sprintf("Todo title #%d", index),
 			Description: fmt.Sprintf("Todo description #%d", index),
@@ -300,6 +300,82 @@ func TestFindByTitleTodos(t *testing.T) {
 	assert.Equal(t, foundTodos[0], currentTodo)
 
 	require.NoError(t, err)
+
+	cleanupDB(t, db)
+}
+
+func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	seedTodos(t, todoService, 10)
+
+	foundTodos, err := todoService.GetByTitle("Some test random text qwerty")
+
+	assert.Equal(t, len(foundTodos), 0)
+
+	require.NoError(t, err)
+
+	cleanupDB(t, db)
+}
+
+func TestGetAll(t *testing.T) {
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	seededTodos := seedTodos(t, todoService, 10)
+
+	foundTodos, err := todoService.GetAll()
+
+	assert.Equal(t, len(foundTodos), 10)
+
+	for index, seededTodo := range seededTodos {
+		assert.Equal(t, seededTodo, *foundTodos[index])
+	}
+
+	require.NoError(t, err)
+
+	cleanupDB(t, db)
+}
+
+func TestDelete(t *testing.T) {
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	seedTodos(t, todoService, 3)
+
+	todoListBeforeRemove, err := todoService.GetAll()
+	require.NoError(t, err)
+
+	errOnDelete := todoService.Delete(1)
+	require.NoError(t, errOnDelete)
+
+	todoListAfterRemove, err := todoService.GetAll()
+	require.NoError(t, err)
+
+	assert.Equal(t, len(todoListBeforeRemove)-1, len(todoListAfterRemove))
+
+	cleanupDB(t, db)
+}
+
+func TestDeleteWithUnrealId(t *testing.T) {
+	db := setupTestDB(t)
+	todoService := NewTodoService(db)
+
+	seedTodos(t, todoService, 3)
+
+	todoListBeforeRemove, err := todoService.GetAll()
+	require.NoError(t, err)
+
+	errOnDelete := todoService.Delete(123)
+	require.NoError(t, errOnDelete)
+
+	assert.Equal(t, errOnDelete, nil)
+
+	todoListAfterRemove, err := todoService.GetAll()
+	require.NoError(t, err)
+
+	assert.Equal(t, len(todoListBeforeRemove), len(todoListAfterRemove))
 
 	cleanupDB(t, db)
 }

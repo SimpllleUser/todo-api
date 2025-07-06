@@ -79,7 +79,7 @@
 				
 				<option value="file11">example/todo-api/internal/services/auth_service.go (0.0%)</option>
 				
-				<option value="file12">example/todo-api/internal/services/todo_service.go (65.0%)</option>
+				<option value="file12">example/todo-api/internal/services/todo_service.go (95.2%)</option>
 				
 				<option value="file13">example/todo-api/internal/services/user_service.go (0.0%)</option>
 				
@@ -844,7 +844,8 @@ func (tc *TodoController) CreateTodos(c *gin.Context) <span class="cov0" title="
                 return
         }</span>
 
-        <span class="cov0" title="0">if err := tc.todoService.Create(&amp;todo); err != nil </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">createdTodo, err := tc.todoService.Create(&amp;todo)
+        if err != nil </span><span class="cov0" title="0">{
                 c.JSON(http.StatusInternalServerError, gin.H{
                         "error": err.Error(),
                 })
@@ -852,7 +853,7 @@ func (tc *TodoController) CreateTodos(c *gin.Context) <span class="cov0" title="
         }</span>
 
         <span class="cov0" title="0">c.JSON(http.StatusCreated, gin.H{
-                "data": todo,
+                "data": createdTodo,
         })</span>
 }
 
@@ -1356,7 +1357,7 @@ func NewTodoService(db *gorm.DB) *TodoService <span class="cov8" title="1">{
         return &amp;TodoService{db: db}
 }</span>
 
-func (t *TodoService) Create(todo *model.TodoCreateRequest) error <span class="cov8" title="1">{
+func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, error) <span class="cov8" title="1">{
         var todoModel = &amp;model.TodoModel{
                 Title:       todo.Title,
                 Description: todo.Description,
@@ -1364,9 +1365,10 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) error <span class="c
         }
         v := validate.Struct(todo)
         if !v.Validate() </span><span class="cov8" title="1">{
-                return fmt.Errorf("validation failed: %v", v.Errors)
+                return nil, fmt.Errorf("validation failed: %v", v.Errors)
         }</span>
-        <span class="cov8" title="1">return t.db.Create(todoModel).Error</span>
+        <span class="cov8" title="1">t.db.Create(todoModel)
+        return todoModel, nil</span>
 }
 
 func (t *TodoService) Update(todo *model.TodoModel) error <span class="cov8" title="1">{
@@ -1383,13 +1385,13 @@ func (t *TodoService) GetById(id uint) (*model.TodoModel, error) <span class="co
         return todo, err
 }</span>
 
-func (t *TodoService) GetByTitle(title string) (*[]*model.TodoModel, error) <span class="cov0" title="0">{
-        var todos []*model.TodoModel
+func (t *TodoService) GetByTitle(title string) ([]model.TodoModel, error) <span class="cov8" title="1">{
+        var todos []model.TodoModel
         err := t.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&amp;todos).Error
-        return &amp;todos, err
+        return todos, err
 }</span>
 
-func (t *TodoService) GetAll() ([]*model.TodoModel, error) <span class="cov0" title="0">{
+func (t *TodoService) GetAll() ([]*model.TodoModel, error) <span class="cov8" title="1">{
         var todos = []*model.TodoModel{}
 
         err := t.db.Find(&amp;todos).Error
