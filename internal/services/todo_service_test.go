@@ -3,31 +3,13 @@ package service
 import (
 	"context"
 	model "example/todo-api/internal/models"
+	test_utils "example/todo-api/internal/testutils"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
-
-func setupTestDB(t *testing.T) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	require.NoError(t, err)
-
-	err = db.AutoMigrate(&model.TodoModel{}, &model.UserModel{})
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		err := db.Exec("DELETE FROM todos").Error
-		require.NoError(t, err)
-
-		err = db.Exec("DELETE FROM users").Error
-		require.NoError(t, err)
-	})
-	return db
-}
 
 func seedTodos(t *testing.T, service *TodoService, count int) []model.TodoModel {
 	todos := make([]model.TodoModel, 0, count)
@@ -56,7 +38,7 @@ func seedTodos(t *testing.T, service *TodoService, count int) []model.TodoModel 
 func TestCreateTodo(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	todo := &model.TodoCreateRequest{
@@ -80,7 +62,7 @@ func TestCreateTodo(t *testing.T) {
 
 func TestValidationCreateTodo(t *testing.T) {
 	t.Parallel()
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	tests := []struct {
@@ -142,7 +124,7 @@ func TestValidationCreateTodo(t *testing.T) {
 func TestUpdateTodo(t *testing.T) {
 	t.Parallel()
 
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	todo := &model.TodoCreateRequest{
@@ -174,7 +156,7 @@ func TestUpdateTodo(t *testing.T) {
 
 func TestValidationUpdateTodo(t *testing.T) {
 
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	tests := []struct {
@@ -239,7 +221,7 @@ func TestValidationUpdateTodo(t *testing.T) {
 }
 
 func TestFindByIdTodo(t *testing.T) {
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	todo := &model.TodoCreateRequest{
@@ -263,7 +245,7 @@ func TestFindByIdTodo(t *testing.T) {
 }
 
 func TestFindByTitleOneMoreTodos(t *testing.T) {
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	todos := seedTodos(t, todoService, 10)
@@ -280,7 +262,7 @@ func TestFindByTitleOneMoreTodos(t *testing.T) {
 }
 
 func TestFindByTitleTodos(t *testing.T) {
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	seedTodos := seedTodos(t, todoService, 10)
@@ -296,7 +278,7 @@ func TestFindByTitleTodos(t *testing.T) {
 }
 
 func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	seedTodos(t, todoService, 10)
@@ -310,7 +292,7 @@ func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
 }
 
 func TestGetAll(t *testing.T) {
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	seededTodos := seedTodos(t, todoService, 10)
@@ -328,7 +310,7 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	seedTodos(t, todoService, 3)
@@ -347,7 +329,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestDeleteWithUnrealId(t *testing.T) {
-	db := setupTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	todoService := NewTodoService(db)
 
 	seedTodos(t, todoService, 3)

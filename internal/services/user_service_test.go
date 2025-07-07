@@ -2,28 +2,13 @@ package service
 
 import (
 	model "example/todo-api/internal/models"
+	test_utils "example/todo-api/internal/testutils"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
-
-func setupUserTestDB(t *testing.T) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	require.NoError(t, err)
-
-	err = db.AutoMigrate(&model.UserModel{})
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		err = db.Exec("DELETE FROM users").Error
-		require.NoError(t, err)
-	})
-	return db
-}
 
 func seedUsers(t *testing.T, service *UserService, count int) []model.UserModel {
 	users := make([]model.UserModel, 0, count)
@@ -50,7 +35,8 @@ func seedUsers(t *testing.T, service *UserService, count int) []model.UserModel 
 
 func TestCreateUser(t *testing.T) {
 	t.Parallel()
-	db := setupUserTestDB(t)
+	db := test_utils.SetupTestDB(t)
+
 	userService := NewUserService(db)
 
 	userReq := &model.UserModel{
@@ -67,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestFindById(t *testing.T) {
 	t.Parallel()
-	db := setupUserTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	userService := NewUserService(db)
 
 	seededUsers := seedUsers(t, userService, 10)
@@ -84,7 +70,7 @@ func TestFindById(t *testing.T) {
 
 func TestFindByLogin(t *testing.T) {
 	t.Parallel()
-	db := setupUserTestDB(t)
+	db := test_utils.SetupTestDB(t)
 	userService := NewUserService(db)
 
 	seededUsers := seedUsers(t, userService, 10)
