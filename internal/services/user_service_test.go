@@ -81,3 +81,19 @@ func TestFindById(t *testing.T) {
 	assert.Equal(t, foundUser.Login, expectedUser.Login)
 	assert.Equal(t, foundUser.Password, expectedUser.Password)
 }
+
+func TestFindByLogin(t *testing.T) {
+	t.Parallel()
+	db := setupUserTestDB(t)
+	userService := NewUserService(db)
+
+	seededUsers := seedUsers(t, userService, 10)
+	expectedUser := seededUsers[5]
+
+	foundUser, err := userService.FindByLogin(expectedUser.Login)
+	require.NoError(t, err)
+
+	assert.Equal(t, foundUser.ID, expectedUser.ID)
+	assert.Equal(t, foundUser.Login, expectedUser.Login)
+	assert.Equal(t, foundUser.Password, expectedUser.Password)
+}
