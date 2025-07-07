@@ -10,13 +10,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type IAuthService interface {
+	FindByLogin(login string) (*model.UserModel, error)
+}
+
 type AuthService struct {
-	userService *UserService
+	userService IAuthService
 }
 
 const EXPIRE = time.Hour * 24
 
-func NewAuthService(us *UserService) *AuthService {
+func NewAuthService(us IAuthService) *AuthService {
 	return &AuthService{
 		userService: us,
 	}
