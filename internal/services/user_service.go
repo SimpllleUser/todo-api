@@ -32,10 +32,10 @@ func (u *UserService) FindByLogin(login string) (*model.UserModel, error) {
 	return &user, err
 }
 
-func (u *UserService) Create(user *model.UserModel) error {
-	err := u.db.Create(&user).Error
+func (u *UserService) Create(user *model.UserModel) (*model.UserModel, error) {
+	err := u.db.Create(user).Error
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return user, nil
 }

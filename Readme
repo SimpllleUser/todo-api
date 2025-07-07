@@ -27,3 +27,9 @@
 ```bash
     go tool cover -html=coverage.out -o coverage.html
 ```
+
+# Run show coverage func
+
+```bash
+    go tool cover -func=coverage.out
+```
