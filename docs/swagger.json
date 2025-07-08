@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "This is a simple API for managing TODOs.",
-        "title": "TODO API2",
+        "title": "TODO API",
         "contact": {},
         "version": "0.0.1"
     },
@@ -141,6 +141,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "update todo",
                 "consumes": [
                     "application/json"
@@ -185,6 +190,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create todo",
                 "consumes": [
                     "application/json"
@@ -231,6 +241,11 @@
         },
         "/todos/:id": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get todo by id",
                 "produces": [
                     "application/json"
@@ -270,6 +285,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "delete todo by id",
                 "produces": [
                     "application/json"
@@ -311,6 +331,11 @@
         },
         "/todos/title/:title": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get todo by title",
                 "produces": [
                     "application/json"

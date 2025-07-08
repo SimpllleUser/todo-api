@@ -80,7 +80,7 @@ host: localhost:8080
 info:
   contact: {}
   description: This is a simple API for managing TODOs.
-  title: TODO API2
+  title: TODO API
   version: 0.0.1
 paths:
   /auth/login:
@@ -194,6 +194,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.HTTPError'
+      security:
+      - BearerAuth: []
       summary: Create todo
       tags:
       - Todos
@@ -223,6 +225,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.HTTPError'
+      security:
+      - BearerAuth: []
       summary: Update todo
       tags:
       - Todos
@@ -250,6 +254,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.HTTPError'
+      security:
+      - BearerAuth: []
       summary: Delete todo by id
       tags:
       - Todos
@@ -276,6 +282,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.HTTPError'
+      security:
+      - BearerAuth: []
       summary: Get todo by id
       tags:
       - Todos
@@ -303,6 +311,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.HTTPError'
+      security:
+      - BearerAuth: []
       summary: Get todo by title
       tags:
       - Todos
