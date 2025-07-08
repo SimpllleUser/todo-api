@@ -63,16 +63,19 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
-	if err := tc.todoService.Create(&todo); err != nil {
+	createdTodo, err := tc.todoService.Create(&todo)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"data": todo,
+		"data": createdTodo,
 	})
 }
 

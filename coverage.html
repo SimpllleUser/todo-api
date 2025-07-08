@@ -1,0 +1,1478 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>cmd: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">example/todo-api/cmd/main.go (0.0%)</option>
+				
+				<option value="file1">example/todo-api/config/loadEnv.go (0.0%)</option>
+				
+				<option value="file2">example/todo-api/docs/docs.go (0.0%)</option>
+				
+				<option value="file3">example/todo-api/internal/database/connect.go (0.0%)</option>
+				
+				<option value="file4">example/todo-api/internal/handlers/auth_handler.go (0.0%)</option>
+				
+				<option value="file5">example/todo-api/internal/handlers/todo_handler.go (0.0%)</option>
+				
+				<option value="file6">example/todo-api/internal/handlers/user_handler.go (0.0%)</option>
+				
+				<option value="file7">example/todo-api/internal/middlewares/auth.go (0.0%)</option>
+				
+				<option value="file8">example/todo-api/internal/models/todo.go (0.0%)</option>
+				
+				<option value="file9">example/todo-api/internal/models/user.go (0.0%)</option>
+				
+				<option value="file10">example/todo-api/internal/routes/routes.go (0.0%)</option>
+				
+				<option value="file11">example/todo-api/internal/services/auth_service.go (0.0%)</option>
+				
+				<option value="file12">example/todo-api/internal/services/todo_service.go (95.2%)</option>
+				
+				<option value="file13">example/todo-api/internal/services/user_service.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "example/todo-api/config"
+        "example/todo-api/internal/database"
+        handler "example/todo-api/internal/handlers"
+        "example/todo-api/internal/routes"
+        service "example/todo-api/internal/services"
+
+        "github.com/gin-gonic/gin"
+)
+
+//        @title                                                TODO API2
+//        @version                                        0.0.1
+//        @description                                This is a simple API for managing TODOs.
+//        @host                                                localhost:8080
+//        @BasePath                                        /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter your token **with** Bearer prefix, e.g. `Bearer &lt;token&gt;`
+
+func main() <span class="cov0" title="0">{
+
+        config.LoadEnv()
+
+        const PATH_TO_DB = "internal/database/app-db.db"
+
+        database.InitDB(PATH_TO_DB)
+
+        defer database.CloseDB()
+
+        todoService := service.NewTodoService(database.DB)
+        userService := service.NewUserService(database.DB)
+        authService := service.NewAuthService(userService)
+
+        todoController := handler.NewTodoController(todoService)
+        userController := handler.NewUserController(userService, authService)
+        authController := handler.NewAuthController(authService)
+
+        r := gin.Default()
+
+        r.Use(gin.Logger())
+        r.Use(gin.Recovery())
+
+        routes.SetupRoutes(r,
+                todoController,
+                userController,
+                authController,
+                userService,
+        )
+
+        r.Run("localhost:8080")
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package config
+
+import "github.com/joho/godotenv"
+
+func LoadEnv() <span class="cov0" title="0">{
+        err := godotenv.Load()
+        if err != nil </span><span class="cov0" title="0">{
+                panic("Error loading .env file")</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">// Package docs Code generated by swaggo/swag. DO NOT EDIT
+package docs
+
+import "github.com/swaggo/swag"
+
+const docTemplate = `{
+    "schemes": {{ marshal .Schemes }},
+    "swagger": "2.0",
+    "info": {
+        "description": "{{escape .Description}}",
+        "title": "{{.Title}}",
+        "contact": {},
+        "version": "{{.Version}}"
+    },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "description": "Login user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Error authenticating user",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not generate token",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/registration": {
+            "post": {
+                "description": "Create user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Create user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserCreateRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/todos": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get todos",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Get all todos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.TodoModel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update todo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Update todo",
+                "parameters": [
+                    {
+                        "description": "Todo data",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TodoModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.TodoModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create todo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Create todo",
+                "parameters": [
+                    {
+                        "description": "Todo data",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.TodoCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.TodoModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/:id": {
+            "get": {
+                "description": "get todo by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Get todo by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.TodoModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete todo by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Delete todo by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Todo ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.BooleanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/todos/title/:title": {
+            "get": {
+                "description": "get todo by title",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Get todo by title",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo title",
+                        "name": "title",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.TodoModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.HTTPError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.AuthInput": {
+            "type": "object",
+            "required": [
+                "login",
+                "password"
+            ],
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.BooleanResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.HTTPError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TodoCreateRequest": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Milk, eggs, bread"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
+                }
+            }
+        },
+        "model.TodoModel": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Milk, eggs, bread"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Buy groceries"
+                }
+            }
+        },
+        "model.UserCreateRequest": {
+            "type": "object",
+            "required": [
+                "token"
+            ],
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/model.UserModel"
+                }
+            }
+        },
+        "model.UserModel": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Enter your token **with** Bearer prefix, e.g. ` + "`" + `Bearer \u003ctoken\u003e` + "`" + `",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}`
+
+// SwaggerInfo holds exported Swagger Info so clients can modify it
+var SwaggerInfo = &amp;swag.Spec{
+        Version:          "0.0.1",
+        Host:             "localhost:8080",
+        BasePath:         "/api/v1",
+        Schemes:          []string{},
+        Title:            "TODO API2",
+        Description:      "This is a simple API for managing TODOs.",
+        InfoInstanceName: "swagger",
+        SwaggerTemplate:  docTemplate,
+        LeftDelim:        "{{",
+        RightDelim:       "}}",
+}
+
+func init() <span class="cov0" title="0">{
+        swag.Register(SwaggerInfo.InstanceName(), SwaggerInfo)
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package database
+
+import (
+        model "example/todo-api/internal/models"
+        "log"
+
+        "gorm.io/driver/sqlite"
+        "gorm.io/gorm"
+)
+
+var DB *gorm.DB
+
+func InitDB(pathToDB string) <span class="cov0" title="0">{
+
+        var err error
+
+        database, err := gorm.Open(sqlite.Open(pathToDB), &amp;gorm.Config{})
+        if err != nil </span><span class="cov0" title="0">{
+                panic("failed connect to DB")</span>
+        }
+
+        <span class="cov0" title="0">err = database.AutoMigrate(&amp;model.TodoModel{}, &amp;model.UserModel{})
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Error on MIGRATE DB")
+        }</span>
+
+        <span class="cov0" title="0">DB = database</span>
+}
+
+func GetDB() *gorm.DB <span class="cov0" title="0">{
+        return DB
+}</span>
+
+func CloseDB() <span class="cov0" title="0">{
+        sqlDB, err := GetDB().DB()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Error on GET DB", err)
+        }</span>
+
+        <span class="cov0" title="0">err = sqlDB.Close()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Error on CLOSE DB", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package handler
+
+import (
+        model "example/todo-api/internal/models"
+        service "example/todo-api/internal/services"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+type AuthController struct {
+        authService *service.AuthService
+}
+
+func NewAuthController(aService *service.AuthService) *AuthController <span class="cov0" title="0">{
+        return &amp;AuthController{
+                authService: aService,
+        }
+}</span>
+
+// Login godoc
+//
+//        @Summary                Login user
+//        @Description        Login user
+//        @Tags                        Auth
+//        @Param                        user        body        model.AuthInput        true        "User data"
+//        @Produce                json
+//        @accept                        json
+//        @Success                200        {object}        model.AuthResponse
+//        @Failure                400        {object}        model.HTTPError        "Invalid request"
+//        @Failure                401        {object}        model.HTTPError        "Error authenticating user"
+//        @Failure                500        {object}        model.HTTPError        "Could not generate token"
+//        @Router                        /auth/login [post]
+func (ac *AuthController) Login(c *gin.Context) <span class="cov0" title="0">{
+        var authInput model.AuthInput
+
+        if err := c.ShouldBindJSON(&amp;authInput); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov0" title="0">userFound, err := ac.authService.Authenticate(authInput.Login, authInput.Password)
+        if err != nil || userFound.ID == 0 </span><span class="cov0" title="0">{
+                c.JSON(http.StatusUnauthorized, gin.H{
+                        "error":   "Error authenticating user",
+                        "message": err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">token, err := ac.authService.GenerateToken(userFound.ID)
+        if err != nil || userFound == nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{
+                "data": token,
+        })</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package handler
+
+import (
+        model "example/todo-api/internal/models"
+        service "example/todo-api/internal/services"
+        "net/http"
+        "strconv"
+
+        "github.com/gin-gonic/gin"
+)
+
+type TodoController struct {
+        todoService *service.TodoService
+}
+
+func NewTodoController(tService *service.TodoService) *TodoController <span class="cov0" title="0">{
+        return &amp;TodoController{
+                todoService: tService,
+        }
+}</span>
+
+// GetTodos godoc
+//
+//        @Summary                Get all todos
+//        @Description        get todos
+//        @Tags                        Todos
+//        @Produce                json
+//        @Success                200        {array}                model.TodoModel
+//        @Failure                500        {object}        model.HTTPError        "Internal server error"
+//        @Router                        /todos [get]
+//
+// @Security BearerAuth
+func (tc *TodoController) GetTodos(c *gin.Context) <span class="cov0" title="0">{
+        todos, err := tc.todoService.GetAll()
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{
+                "data": todos,
+        })</span>
+}
+
+// CreateTodos godoc
+//
+//        @Summary                Create todo
+//        @Description        Create todo
+//        @Tags                        Todos
+//        @Param                        todo        body        model.TodoCreateRequest        true        "Todo data"
+//        @Produce                json
+//        @accept                        json
+//        @Success                200        {object}        model.TodoModel
+//        @Failure                400        {object}        model.HTTPError        "Invalid request"
+//        @Failure                500        {object}        model.HTTPError        "Internal server error"
+//        @Router                        /todos [post]
+//
+// @Security BearerAuth
+func (tc *TodoController) CreateTodos(c *gin.Context) <span class="cov0" title="0">{
+        var todo model.TodoCreateRequest
+
+        if err := c.ShouldBindJSON(&amp;todo); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "error": err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">createdTodo, err := tc.todoService.Create(&amp;todo)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{
+                        "error": err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusCreated, gin.H{
+                "data": createdTodo,
+        })</span>
+}
+
+// GetTodoById godoc
+//
+//        @Summary                Get todo by id
+//        @Description        get todo by id
+//        @Param                        id        path        int        true        "Todo ID"
+//        @Tags                        Todos
+//        @Produce                json
+//        @Success                302        {object}        model.TodoModel
+//        @Failure                400        {object}        model.HTTPError        "Invalid request"
+//        @Failure                500        {object}        model.HTTPError        "Internal server error"
+//        @Router                        /todos/:id [get]
+//
+// @Security BearerAuth
+func (tc *TodoController) GetTodoById(c *gin.Context) <span class="cov0" title="0">{
+        id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+                return
+
+        }</span>
+
+        <span class="cov0" title="0">todo, err := tc.todoService.GetById(uint(id))
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusFound, gin.H{
+                "data": todo,
+        })</span>
+}
+
+// GetTodoByTitle godoc
+//
+//        @Summary                Get todo by title
+//        @Description        get todo by title
+//        @Param                        title        path        string        true        "Todo title"
+//        @Tags                        Todos
+//        @Produce                json
+//        @Success                200        {object}        model.TodoModel
+//        @Failure                400        {object}        model.HTTPError        "Invalid request"
+//        @Failure                500        {object}        model.HTTPError        "Internal server error"
+//        @Router                        /todos/title/:title [get]
+//
+// @Security BearerAuth
+func (tc *TodoController) GetTodoByTitle(c *gin.Context) <span class="cov0" title="0">{
+        println(c.Params)
+        title := c.Param("title")
+
+        if title == "" </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Title"})
+                return
+
+        }</span>
+
+        <span class="cov0" title="0">todo, err := tc.todoService.GetByTitle(title)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusFound, gin.H{
+                "data": todo,
+        })</span>
+}
+
+// UpdateTodo godoc
+//
+//        @Summary                Update todo
+//        @Description        update todo
+//        @Tags                        Todos
+//        @Param                        todo        body        model.TodoModel        true        "Todo data"
+//        @Produce                json
+//        @accept                        json
+//        @Success                200        {object}        model.TodoModel
+//        @Failure                400        {object}        model.HTTPError        "Invalid request"
+//        @Failure                500        {object}        model.HTTPError        "Internal server error"
+//        @Router                        /todos [put]
+//
+// @Security BearerAuth
+func (tc *TodoController) UpdateTodo(c *gin.Context) <span class="cov0" title="0">{
+        id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+                return
+        }</span>
+
+        <span class="cov0" title="0">todo, err := tc.todoService.GetById(uint(id))
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := c.ShouldBindJSON(todo); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "error": err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := tc.todoService.Update(todo); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{
+                        "error": err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{
+                "data": todo,
+        })</span>
+}
+
+// DeleteTodo godoc
+//
+//        @Summary                Delete todo by id
+//        @Description        delete todo by id
+//        @Param                        id        path        int        true        "Todo ID"
+//        @Tags                        Todos
+//        @Produce                json
+//        @Success                200        {object}        model.BooleanResponse
+//        @Failure                400        {object}        model.HTTPError        "Invalid request"
+//        @Failure                500        {object}        model.HTTPError        "Internal server error"
+//        @Router                        /todos/:id [delete]
+//
+// @Security BearerAuth
+func (tc *TodoController) DeleteTodo(c *gin.Context) <span class="cov0" title="0">{
+        id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := tc.todoService.Delete(uint(id)); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{
+                "data": true,
+        })</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package handler
+
+import (
+        model "example/todo-api/internal/models"
+        service "example/todo-api/internal/services"
+        "log"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        "golang.org/x/crypto/bcrypt"
+)
+
+type UserController struct {
+        userService *service.UserService
+        authService *service.AuthService
+}
+
+func NewUserController(uService *service.UserService, aService *service.AuthService) *UserController <span class="cov0" title="0">{
+        return &amp;UserController{
+                userService: uService,
+                authService: aService,
+        }
+}</span>
+
+var errorBody = gin.H{"error": "Internal server error"}
+
+// CreateUser godoc
+//
+//        @Summary                Create user
+//        @Description        Create user
+//        @Tags                        Auth
+//        @Param                        user        body        model.AuthInput        true        "User data"
+//        @Produce                json
+//        @accept                        json
+//        @Success                200        {object}        model.UserCreateRequest
+//        @Failure                400        {object}        model.HTTPError        "Invalid request"
+//        @Failure                500        {object}        model.HTTPError        "Internal server error"
+//        @Router                        /auth/registration [post]
+func (uc *UserController) CreateUser(c *gin.Context) <span class="cov0" title="0">{
+
+        var authInput model.AuthInput
+
+        if err := c.ShouldBindJSON(&amp;authInput); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, errorBody)
+                return
+        }</span>
+
+        <span class="cov0" title="0">var userFound, err = uc.userService.FindByLogin(authInput.Login)
+        if userFound.ID != 0 </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, gin.H{
+                        "error": "User with this login already exists",
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">passwordHash, err := bcrypt.GenerateFromPassword([]byte(authInput.Password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("Could not hash password:", err)
+                c.JSON(http.StatusInternalServerError, errorBody)
+                return
+        }</span>
+
+        <span class="cov0" title="0">user := &amp;model.UserModel{
+                Login:    authInput.Login,
+                Password: string(passwordHash),
+        }
+
+        err = uc.userService.Create(user)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, errorBody)
+                return
+        }</span>
+
+        <span class="cov0" title="0">token, err := uc.authService.GenerateToken(user.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("Could not generate token:", err)
+                c.JSON(http.StatusInternalServerError, errorBody)
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusCreated, gin.H{
+                "data": gin.H{
+                        "user":  user,
+                        "token": token,
+                },
+        })</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package middlewares
+
+import (
+        service "example/todo-api/internal/services"
+        "fmt"
+        "net/http"
+        "os"
+        "strings"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/golang-jwt/jwt"
+)
+
+func CheckAuth(userService *service.UserService) gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                println("Checking authentication...")
+                authHeader := c.GetHeader("Authorization")
+
+                if authHeader == "" </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{
+                                "error": "Authorization header is required",
+                        })
+                        c.AbortWithStatus(http.StatusUnauthorized)
+                        return
+                }</span>
+                <span class="cov0" title="0">authToken := strings.Split(authHeader, " ")
+
+                if len(authToken) != 2 || authToken[0] != "Bearer" </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{
+                                "error": "Invalid token",
+                        })
+                        c.AbortWithStatus(http.StatusUnauthorized)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">tokenString := authToken[1]
+
+                token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) </span><span class="cov0" title="0">{
+                        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok </span><span class="cov0" title="0">{
+                                return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+                        }</span>
+                        <span class="cov0" title="0">return []byte(os.Getenv("SECRET_KEY")), nil</span>
+                })
+
+                <span class="cov0" title="0">if (err != nil) || !token.Valid </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+                        c.AbortWithStatus(http.StatusUnauthorized)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">claims, ok := token.Claims.(jwt.MapClaims)
+
+                if !ok </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+                        c.Abort()
+                        return
+                }</span>
+
+                <span class="cov0" title="0">if float64(time.Now().Unix()) &gt; claims["exp"].(float64) </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "Error token expired"})
+                        c.AbortWithStatus(http.StatusUnauthorized)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">user, err := userService.FindById(uint(claims["id"].(float64)))
+
+                if err != nil || user.ID == 0 </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+                        c.AbortWithStatus(http.StatusUnauthorized)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">c.Set("user", user)
+                c.Next()</span>
+
+        }
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package model
+
+type TodoModel struct {
+        ID          uint   `gorm:"primaryKey" json:"id" example:"1"`
+        Title       string `gorm:"not null" json:"title" validate:"required|minLen:3" filter:"trim" message:"required:{field} is required" label:"Title" example:"Buy groceries"`
+        Description string `gorm:"null" json:"description" example:"Milk, eggs, bread"`
+        Completed   bool   `gorm:"default:false" json:"completed" example:"false"`
+}
+
+type TodoCreateRequest struct {
+        Title       string `gorm:"not null" json:"title" validate:"required|minLen:3" filter:"trim" message:"required:{field} is required" label:"Title" example:"Buy groceries"`
+        Description string `gorm:"null" json:"description" example:"Milk, eggs, bread"`
+        Completed   bool   `gorm:"default:false" json:"completed" example:"false"`
+}
+
+func (TodoModel) TableName() string <span class="cov0" title="0">{
+        return "todos"
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package model
+
+import (
+        "time"
+)
+
+type UserModel struct {
+        ID        uint   `json:"id" gorm:"primaryKey"`
+        Login     string `json:"login" gorm:"unique"`
+        Name      string `json:"name" gorm:"not null"`
+        Password  string `json:"password" gorm:"not null"`
+        CreatedAt time.Time
+        UpdatedAt time.Time
+}
+
+func (UserModel) TableName() string <span class="cov0" title="0">{
+        return "users"
+}</span>
+
+type UserCreateRequest struct {
+        User  UserModel `json:"user"`
+        Token string    `json:"token" binding:"required"`
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package routes
+
+import (
+        _ "example/todo-api/docs"
+        handler "example/todo-api/internal/handlers"
+        "example/todo-api/internal/middlewares"
+        service "example/todo-api/internal/services"
+
+        "github.com/gin-gonic/gin"
+        swaggerFiles "github.com/swaggo/files"
+        ginSwagger "github.com/swaggo/gin-swagger"
+)
+
+//        @title                        My API
+//        @version                1.0
+//        @description        This is a sample REST API server.
+//        @host                        localhost:8080
+//        @BasePath                /api/v1
+
+func SetupRoutes(r *gin.Engine,
+        todoHandler *handler.TodoController,
+        userHandler *handler.UserController,
+        authHandler *handler.AuthController,
+        userService *service.UserService,
+) <span class="cov0" title="0">{
+        api := r.Group("/api/v1")
+        </span><span class="cov0" title="0">{
+                todos := api.Group("/todos")
+                todos.Use(middlewares.CheckAuth(userService))
+                </span><span class="cov0" title="0">{
+                        todos.GET("", todoHandler.GetTodos)
+                        todos.GET("/:id", todoHandler.GetTodoById)
+                        todos.GET("/title/:title", todoHandler.GetTodoByTitle)
+                        todos.POST("", todoHandler.CreateTodos)
+                        todos.PATCH("/:id", todoHandler.UpdateTodo)
+                        todos.DELETE("/:id", todoHandler.DeleteTodo)
+                }</span>
+
+                <span class="cov0" title="0">auth := api.Group("/auth")
+                </span><span class="cov0" title="0">{
+                        auth.POST("/login", authHandler.Login)
+                        auth.POST("/registration", userHandler.CreateUser)
+                }</span>
+        }
+
+        <span class="cov0" title="0">r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package service
+
+import (
+        model "example/todo-api/internal/models"
+        "log"
+        "os"
+        "time"
+
+        "github.com/golang-jwt/jwt"
+        "golang.org/x/crypto/bcrypt"
+)
+
+type AuthService struct {
+        userService *UserService
+}
+
+const EXPIRE = time.Hour * 24
+
+func NewAuthService(us *UserService) *AuthService <span class="cov0" title="0">{
+        return &amp;AuthService{
+                userService: us,
+        }
+}</span>
+
+func (as *AuthService) Authenticate(login string, password string) (*model.UserModel, error) <span class="cov0" title="0">{
+        var userFound, err = as.userService.FindByLogin(login)
+
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("Error find user by login", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if err := compareHashAndPassword([]byte(userFound.Password), []byte(password)); err != nil </span><span class="cov0" title="0">{
+                log.Println("Error comparing password:", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return userFound, nil</span>
+}
+
+func (as *AuthService) GenerateToken(userId uint) (string, error) <span class="cov0" title="0">{
+
+        generateToken := getClaim(jwt.MapClaims{
+                "id":  userId,
+                "exp": time.Now().Add(EXPIRE).Unix(),
+        })
+
+        token, err := generateToken.SignedString([]byte(os.Getenv("SECRET_KEY")))
+
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("Could not generate token", err)
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">return token, nil</span>
+}
+
+func compareHashAndPassword(userPassword []byte, inputPassword []byte) error <span class="cov0" title="0">{
+        if len(userPassword) == 0 || len(inputPassword) == 0 </span><span class="cov0" title="0">{
+                return bcrypt.ErrMismatchedHashAndPassword
+        }</span>
+        <span class="cov0" title="0">return bcrypt.CompareHashAndPassword(userPassword, inputPassword)</span>
+}
+
+func getClaim(claims jwt.Claims) *jwt.Token <span class="cov0" title="0">{
+        return jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package service
+
+import (
+        model "example/todo-api/internal/models"
+        "fmt"
+
+        "github.com/gookit/validate"
+        "gorm.io/gorm"
+)
+
+type TodoService struct {
+        db *gorm.DB
+}
+
+func NewTodoService(db *gorm.DB) *TodoService <span class="cov8" title="1">{
+        return &amp;TodoService{db: db}
+}</span>
+
+func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, error) <span class="cov8" title="1">{
+        var todoModel = &amp;model.TodoModel{
+                Title:       todo.Title,
+                Description: todo.Description,
+                Completed:   todo.Completed,
+        }
+        v := validate.Struct(todo)
+        if !v.Validate() </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("validation failed: %v", v.Errors)
+        }</span>
+        <span class="cov8" title="1">t.db.Create(todoModel)
+        return todoModel, nil</span>
+}
+
+func (t *TodoService) Update(todo *model.TodoModel) error <span class="cov8" title="1">{
+        v := validate.Struct(todo)
+        if !v.Validate() </span><span class="cov8" title="1">{
+                return fmt.Errorf("validation failed: %v", v.Errors)
+        }</span>
+        <span class="cov8" title="1">return t.db.Save(todo).Error</span>
+}
+
+func (t *TodoService) GetById(id uint) (*model.TodoModel, error) <span class="cov8" title="1">{
+        var todo *model.TodoModel
+        err := t.db.Find(&amp;todo, id).Error
+        return todo, err
+}</span>
+
+func (t *TodoService) GetByTitle(title string) ([]model.TodoModel, error) <span class="cov8" title="1">{
+        var todos []model.TodoModel
+        err := t.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&amp;todos).Error
+        return todos, err
+}</span>
+
+func (t *TodoService) GetAll() ([]*model.TodoModel, error) <span class="cov8" title="1">{
+        var todos = []*model.TodoModel{}
+
+        err := t.db.Find(&amp;todos).Error
+        return todos, err
+}</span>
+
+func (t *TodoService) Delete(id uint) error <span class="cov0" title="0">{
+        return t.db.Delete(&amp;model.TodoModel{}, id).Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package service
+
+import (
+        model "example/todo-api/internal/models"
+
+        "gorm.io/gorm"
+)
+
+type UserService struct {
+        db *gorm.DB
+}
+
+func NewUserService(db *gorm.DB) *UserService <span class="cov0" title="0">{
+        return &amp;UserService{db: db}
+}</span>
+
+func (u *UserService) FindById(id uint) (*model.UserModel, error) <span class="cov0" title="0">{
+        var user model.UserModel
+        err := u.db.Find(&amp;user, id).Error
+        return &amp;user, err
+}</span>
+
+func (u *UserService) FindByName(name string) (*model.UserModel, error) <span class="cov0" title="0">{
+        var user model.UserModel
+        err := u.db.Where("name = ?", name).First(&amp;user).Error
+        return &amp;user, err
+}</span>
+
+func (u *UserService) FindByLogin(login string) (*model.UserModel, error) <span class="cov0" title="0">{
+        var user model.UserModel
+        err := u.db.Where("login = ?", login).First(&amp;user).Error
+        return &amp;user, err
+}</span>
+
+func (u *UserService) Create(user *model.UserModel) error <span class="cov0" title="0">{
+        err := u.db.Create(&amp;user).Error
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

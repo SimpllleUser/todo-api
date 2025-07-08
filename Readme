@@ -1,92 +1,35 @@
-# ▶ Запуск без білду (тимчасовий)
-
-```
-go run ./cmd
-```
-
-# 🔁 Запуск з автоматичним hot reload через Air
-
-```
-air
-```
-# 📝 Генерація Swagger-документації
-
-```
-swag init -g ./cmd/main.go
-```
-
-
-
-# Встановлення Air
+# Run
 
 ```bash
-
-bash
-go install github.com/air-verse/air@latest
-
+    go run ./cmd
 ```
 
-# ⚙️ Ініціалізація конфігурації
+# Generate docs
 
 ```bash
-
-bash
-air init
-
+    swag init -g ./cmd/main.go
 ```
 
-# 🔧 Налаштування PATH для Fish Terminal
-
-Якщо команда `air` не знайдена, потрібно додати Go bin директорію до PATH.
-
-Перевірте шлях до Go bin:
+#Run test
 
 ```bash
-
-bash
-echo $GOPATH/bin
-
+    go test -v ./internal/services
 ```
 
-Якщо `$GOPATH` не встановлений, використовуйте `~/go/bin`.
-
-Відкрийте конфігураційний файл Fish:
+# Run test coverage
 
 ```bash
-
-bash
-nano ~/.config/fish/config.fish
-
+    go test -coverprofile=coverage.out ./...
 ```
 
-Додайте рядок:
+# Run show coverage in html
 
 ```bash
-
-bash
-set -gx PATH $PATH $GOPATH/bin
-
+    go tool cover -html=coverage.out -o coverage.html
 ```
 
-Або якщо `$GOPATH` не встановлений:
+# Run show coverage func
 
 ```bash
-
-bash
-set -gx PATH $PATH ~/go/bin
-
-```
-
-# 🔄 Перезавантаження конфігурації
-
-```bash
-
-bash
-source ~/.config/fish/config.fish
-
-```
-
-# ✅ Тестування встановлення
-```
-air
+    go tool cover -func=coverage.out
 ```

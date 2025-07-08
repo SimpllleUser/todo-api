@@ -1,2 +1,3 @@
-tmpl/*
+tmp
 .env
+coverage.html

@@ -65,7 +65,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		Password: string(passwordHash),
 	}
 
-	err = uc.userService.Create(user)
+	_, err = uc.userService.Create(user)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, errorBody)

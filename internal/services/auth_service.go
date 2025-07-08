@@ -10,13 +10,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type IAuthService interface {
+	FindByLogin(login string) (*model.UserModel, error)
+}
+
 type AuthService struct {
-	userService *UserService
+	userService IAuthService
 }
 
 const EXPIRE = time.Hour * 24
 
-func NewAuthService(us *UserService) *AuthService {
+func NewAuthService(us IAuthService) *AuthService {
 	return &AuthService{
 		userService: us,
 	}
@@ -26,7 +30,7 @@ func (as *AuthService) Authenticate(login string, password string) (*model.UserM
 	var userFound, err = as.userService.FindByLogin(login)
 
 	if err != nil {
-		log.Println("Error find user by login", err)
+		log.Println("Error user not found by login", err)
 		return nil, err
 	}
 
