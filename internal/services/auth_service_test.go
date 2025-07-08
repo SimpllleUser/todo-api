@@ -2,8 +2,10 @@ package service
 
 import (
 	model "example/todo-api/internal/models"
+	"os"
 	"testing"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
@@ -100,4 +102,42 @@ func Test_User_Auth_UserNotFound(t *testing.T) {
 	require.Error(t, err)
 
 	assert.Nil(t, authedUser)
+}
+
+func Test_User_Auth_GenerateToken(t *testing.T) {
+
+	os.Setenv("SECRET_KEY", "test_secret")
+
+	password := "my_pass"
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	mockUser := &model.UserModel{
+		ID:       1,
+		Login:    "my_login",
+		Password: string(hashedPassword),
+	}
+
+	fakeService := &fakerUserService{
+		users: map[string]*model.UserModel{
+			"my_login": mockUser,
+		},
+	}
+
+	authService := NewAuthService(fakeService)
+	tokenStr, err := authService.GenerateToken(mockUser.ID)
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, tokenStr)
+
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		return []byte("test_secret"), nil
+	})
+
+	require.NoError(t, err)
+
+	assert.True(t, token.Valid)
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	assert.EqualValues(t, mockUser.ID, claims["id"])
 }
