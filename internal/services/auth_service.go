@@ -30,7 +30,7 @@ func (as *AuthService) Authenticate(login string, password string) (*model.UserM
 	var userFound, err = as.userService.FindByLogin(login)
 
 	if err != nil {
-		log.Println("Error find user by login", err)
+		log.Println("Error user not found by login", err)
 		return nil, err
 	}
 
