@@ -66,6 +66,10 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 		return
 	}
 
+	userId := c.GetUint("id")
+
+	todo.UserId = userId
+
 	createdTodo, err := tc.todoService.Create(&todo)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

@@ -21,6 +21,7 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, e
 		Title:       todo.Title,
 		Description: todo.Description,
 		Completed:   todo.Completed,
+		UserId:      todo.UserId,
 	}
 	v := validate.Struct(todo)
 	if !v.Validate() {
