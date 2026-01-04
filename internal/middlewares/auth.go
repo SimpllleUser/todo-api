@@ -64,6 +64,8 @@ func CheckAuth(userService *service.UserService) gin.HandlerFunc {
 		}
 
 		user, err := userService.FindById(uint(claims["id"].(float64)))
+		
+		c.Set("id", uint(claims["id"].(float64)))
 
 		if err != nil || user.ID == 0 {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})

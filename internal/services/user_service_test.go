@@ -26,6 +26,7 @@ func seedUsers(t *testing.T, service *UserService, count int) []model.UserModel 
 			ID:       createdUser.ID,
 			Login:    createdUser.Login,
 			Password: createdUser.Password,
+			UserId:   createdUser.UserId,
 		})
 
 	}
@@ -82,4 +83,5 @@ func TestFindByLogin(t *testing.T) {
 	assert.Equal(t, foundUser.ID, expectedUser.ID)
 	assert.Equal(t, foundUser.Login, expectedUser.Login)
 	assert.Equal(t, foundUser.Password, expectedUser.Password)
+	assert.Equal(t, foundUser.UserId, expectedUser.UserId)
 }

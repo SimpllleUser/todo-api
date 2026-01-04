@@ -9,6 +9,7 @@ type UserModel struct {
 	Login     string `json:"login" gorm:"unique"`
 	Name      string `json:"name" gorm:"not null"`
 	Password  string `json:"password" gorm:"not null"`
+	UserId    uint   `json:"user_id" gorm:"not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
