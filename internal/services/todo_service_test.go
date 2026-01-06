@@ -233,7 +233,7 @@ func TestFindByIdTodo(t *testing.T) {
 
 	const todoID = uint(1)
 
-	found, err := todoService.GetById(todoID)
+	found, err := todoService.GetById(todoID, 1)
 
 	require.NoError(t, err)
 
