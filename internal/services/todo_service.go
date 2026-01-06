@@ -39,25 +39,26 @@ func (t *TodoService) Update(todo *model.TodoModel) error {
 	return t.db.Save(todo).Error
 }
 
-func (t *TodoService) GetById(id uint) (*model.TodoModel, error) {
+func (t *TodoService) GetById(id uint, userId uint) (*model.TodoModel, error) {
 	var todo *model.TodoModel
-	err := t.db.Find(&todo, id).Error
+	err := t.db.First(&todo, "id = ? AND user_id = ?", id, userId).Error
 	return todo, err
 }
 
-func (t *TodoService) GetByTitle(title string) ([]model.TodoModel, error) {
+func (t *TodoService) GetByTitle(title string, userId uint) ([]model.TodoModel, error) {
+
 	var todos []model.TodoModel
-	err := t.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&todos).Error
+	err := t.db.Where("title LIKE ? AND user_id = ?", "%"+title+"%", userId).Limit(2).Find(&todos).Error
 	return todos, err
 }
 
-func (t *TodoService) GetAll() ([]*model.TodoModel, error) {
+func (t *TodoService) GetAll(userId uint) ([]*model.TodoModel, error) {
 	var todos = []*model.TodoModel{}
 
-	err := t.db.Find(&todos).Error
+	err := t.db.Where("user_id = ?", userId).Find(&todos).Error
 	return todos, err
 }
 
-func (t *TodoService) Delete(id uint) error {
-	return t.db.Delete(&model.TodoModel{}, id).Error
+func (t *TodoService) Delete(id uint, userId uint) error {
+	return t.db.Delete(&model.TodoModel{}, "id = ? AND user_id = ?", id, userId).Error
 }
