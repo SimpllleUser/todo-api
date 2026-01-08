@@ -19,10 +19,6 @@ func NewTodoController(tService *service.TodoService) *TodoController {
 	}
 }
 
-func getUserId(c *gin.Context) uint {
-	return c.GetUint("id")
-}
-
 // GetTodos godoc
 //
 //	@Summary		Get all todos
@@ -35,7 +31,7 @@ func getUserId(c *gin.Context) uint {
 //
 // @Security BearerAuth
 func (tc *TodoController) GetTodos(c *gin.Context) {
-	todos, err := tc.todoService.GetAll(getUserId(c))
+	todos, err := tc.todoService.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -69,8 +65,6 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 		})
 		return
 	}
-
-	todo.UserId = getUserId(c)
 
 	createdTodo, err := tc.todoService.Create(&todo)
 	if err != nil {
@@ -107,7 +101,7 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 
 	}
 
-	todo, err := tc.todoService.GetById(uint(id), getUserId(c))
+	todo, err := tc.todoService.GetById(uint(id))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -133,6 +127,7 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 //
 // @Security BearerAuth
 func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
+	println(c.Params)
 	title := c.Param("title")
 
 	if title == "" {
@@ -141,7 +136,7 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 
 	}
 
-	todo, err := tc.todoService.GetByTitle(title, getUserId(c))
+	todo, err := tc.todoService.GetByTitle(title)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -164,7 +159,7 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 //	@Success		200	{object}	model.TodoModel
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
-//	@Router			/todos [patch]
+//	@Router			/todos [put]
 //
 // @Security BearerAuth
 func (tc *TodoController) UpdateTodo(c *gin.Context) {
@@ -174,9 +169,7 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 		return
 	}
 
-	userId := getUserId(c)
-
-	todo, err := tc.todoService.GetById(uint(id), userId)
+	todo, err := tc.todoService.GetById(uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -195,8 +188,6 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 		})
 		return
 	}
-
-	todo.UserId = userId
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": todo,
@@ -224,7 +215,7 @@ func (tc *TodoController) DeleteTodo(c *gin.Context) {
 		return
 	}
 
-	if err := tc.todoService.Delete(uint(id), getUserId(c)); err != nil {
+	if err := tc.todoService.Delete(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
