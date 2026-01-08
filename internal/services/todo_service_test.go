@@ -233,7 +233,7 @@ func TestFindByIdTodo(t *testing.T) {
 
 	const todoID = uint(1)
 
-	found, err := todoService.GetById(todoID, 1)
+	found, err := todoService.GetById(todoID)
 
 	require.NoError(t, err)
 
@@ -290,6 +290,8 @@ func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
 	require.NoError(t, err)
 
 }
+
+// 21asdasd
 
 func TestGetAll(t *testing.T) {
 	db := test_utils.SetupTestDB(t)
