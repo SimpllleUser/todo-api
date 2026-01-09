@@ -19,10 +19,8 @@ func NewTodoService(db *gorm.DB, userId uint) *TodoService {
 
 func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, error) {
 	var todoModel = &model.TodoModel{
-		Title:       todo.Title,
-		Description: todo.Description,
-		Completed:   todo.Completed,
-		UserId:      t.UserId,
+		TodoBaseFields: todo.TodoBaseFields,
+		UserId:         t.UserId,
 	}
 	v := validate.Struct(todo)
 	if !v.Validate() {
