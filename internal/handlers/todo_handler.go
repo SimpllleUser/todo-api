@@ -3,7 +3,6 @@ package handler
 import (
 	model "example/todo-api/internal/models"
 	service "example/todo-api/internal/services"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -69,8 +68,6 @@ func (tc *TodoController) GetTodos(c *gin.Context) {
 // @Security BearerAuth
 func (tc *TodoController) CreateTodos(c *gin.Context) {
 	var todo model.TodoCreateRequest
-
-	fmt.Printf("Creating todo for user ID: %d\n", tc.getUserId(c))
 
 	if err := c.ShouldBindJSON(&todo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
