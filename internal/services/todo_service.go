@@ -9,11 +9,12 @@ import (
 )
 
 type TodoService struct {
-	db *gorm.DB
+	db     *gorm.DB
+	UserId uint
 }
 
-func NewTodoService(db *gorm.DB) *TodoService {
-	return &TodoService{db: db}
+func NewTodoService(db *gorm.DB, userId uint) *TodoService {
+	return &TodoService{db: db, UserId: userId}
 }
 
 func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, error) {
@@ -21,6 +22,7 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, e
 		Title:       todo.Title,
 		Description: todo.Description,
 		Completed:   todo.Completed,
+		UserId:      t.UserId,
 	}
 	v := validate.Struct(todo)
 	if !v.Validate() {

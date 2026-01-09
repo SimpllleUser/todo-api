@@ -30,11 +30,11 @@ func main() {
 
 	defer database.CloseDB()
 
-	todoService := service.NewTodoService(database.DB)
 	userService := service.NewUserService(database.DB)
+	userScopeService := service.NewUserScopeService(database.DB)
 	authService := service.NewAuthService(userService)
 
-	todoController := handler.NewTodoController(todoService)
+	todoController := handler.NewTodoController(userScopeService)
 	userController := handler.NewUserController(userService, authService)
 	authController := handler.NewAuthController(authService)
 

@@ -3,6 +3,7 @@ package handler
 import (
 	model "example/todo-api/internal/models"
 	service "example/todo-api/internal/services"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,13 +11,22 @@ import (
 )
 
 type TodoController struct {
-	todoService *service.TodoService
+	userScope *service.UserScopeService
 }
 
-func NewTodoController(tService *service.TodoService) *TodoController {
+func NewTodoController(uService *service.UserScopeService) *TodoController {
 	return &TodoController{
-		todoService: tService,
+		userScope: uService,
 	}
+}
+
+func (tc *TodoController) getUserId(c *gin.Context) uint {
+	return c.GetUint("userId")
+}
+
+func (tc *TodoController) forUser(c *gin.Context) *service.TodoService {
+	userId := tc.getUserId(c)
+	return tc.userScope.ForUser(userId).Todo()
 }
 
 // GetTodos godoc
@@ -31,7 +41,8 @@ func NewTodoController(tService *service.TodoService) *TodoController {
 //
 // @Security BearerAuth
 func (tc *TodoController) GetTodos(c *gin.Context) {
-	todos, err := tc.todoService.GetAll()
+
+	todos, err := tc.forUser(c).GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -59,6 +70,8 @@ func (tc *TodoController) GetTodos(c *gin.Context) {
 func (tc *TodoController) CreateTodos(c *gin.Context) {
 	var todo model.TodoCreateRequest
 
+	fmt.Printf("Creating todo for user ID: %d\n", tc.getUserId(c))
+
 	if err := c.ShouldBindJSON(&todo); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -66,7 +79,7 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 		return
 	}
 
-	createdTodo, err := tc.todoService.Create(&todo)
+	createdTodo, err := tc.forUser(c).Create(&todo)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -101,7 +114,7 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 
 	}
 
-	todo, err := tc.todoService.GetById(uint(id))
+	todo, err := tc.forUser(c).GetById(uint(id))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -136,7 +149,7 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 
 	}
 
-	todo, err := tc.todoService.GetByTitle(title)
+	todo, err := tc.forUser(c).GetByTitle(title)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -169,7 +182,7 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 		return
 	}
 
-	todo, err := tc.todoService.GetById(uint(id))
+	todo, err := tc.forUser(c).GetById(uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -182,7 +195,7 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 		return
 	}
 
-	if err := tc.todoService.Update(todo); err != nil {
+	if err := tc.forUser(c).Update(todo); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -215,7 +228,7 @@ func (tc *TodoController) DeleteTodo(c *gin.Context) {
 		return
 	}
 
-	if err := tc.todoService.Delete(uint(id)); err != nil {
+	if err := tc.forUser(c).Delete(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
