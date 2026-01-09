@@ -9,11 +9,12 @@ import (
 )
 
 type TodoService struct {
-	db *gorm.DB
+	db     *gorm.DB
+	UserId uint
 }
 
-func NewTodoService(db *gorm.DB) *TodoService {
-	return &TodoService{db: db}
+func NewTodoService(db *gorm.DB, userId uint) *TodoService {
+	return &TodoService{db: db, UserId: userId}
 }
 
 func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, error) {
@@ -21,7 +22,7 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, e
 		Title:       todo.Title,
 		Description: todo.Description,
 		Completed:   todo.Completed,
-		UserId:      todo.UserId,
+		UserId:      t.UserId,
 	}
 	v := validate.Struct(todo)
 	if !v.Validate() {
@@ -39,26 +40,25 @@ func (t *TodoService) Update(todo *model.TodoModel) error {
 	return t.db.Save(todo).Error
 }
 
-func (t *TodoService) GetById(id uint, userId uint) (*model.TodoModel, error) {
+func (t *TodoService) GetById(id uint) (*model.TodoModel, error) {
 	var todo *model.TodoModel
-	err := t.db.First(&todo, "id = ? AND user_id = ?", id, userId).Error
+	err := t.db.Find(&todo, id).Error
 	return todo, err
 }
 
-func (t *TodoService) GetByTitle(title string, userId uint) ([]model.TodoModel, error) {
-
+func (t *TodoService) GetByTitle(title string) ([]model.TodoModel, error) {
 	var todos []model.TodoModel
-	err := t.db.Where("title LIKE ? AND user_id = ?", "%"+title+"%", userId).Limit(2).Find(&todos).Error
+	err := t.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&todos).Error
 	return todos, err
 }
 
-func (t *TodoService) GetAll(userId uint) ([]*model.TodoModel, error) {
+func (t *TodoService) GetAll() ([]*model.TodoModel, error) {
 	var todos = []*model.TodoModel{}
 
-	err := t.db.Where("user_id = ?", userId).Find(&todos).Error
+	err := t.db.Find(&todos).Error
 	return todos, err
 }
 
-func (t *TodoService) Delete(id uint, userId uint) error {
-	return t.db.Delete(&model.TodoModel{}, "id = ? AND user_id = ?", id, userId).Error
+func (t *TodoService) Delete(id uint) error {
+	return t.db.Delete(&model.TodoModel{}, id).Error
 }
