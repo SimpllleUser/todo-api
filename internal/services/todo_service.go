@@ -1,6 +1,7 @@
 package service
 
 import (
+	httpUtil "example/todo-api/internal/http_util"
 	model "example/todo-api/internal/models"
 	"fmt"
 
@@ -39,9 +40,7 @@ func (t *TodoService) Update(todo *model.TodoModel) error {
 }
 
 func (t *TodoService) GetById(id uint) (*model.TodoModel, error) {
-	var todo *model.TodoModel
-	err := t.db.Find(&todo, id).Error
-	return todo, err
+	return httpUtil.FindByID[model.TodoModel](t.db, id)
 }
 
 func (t *TodoService) GetByTitle(title string) ([]model.TodoModel, error) {
@@ -51,12 +50,10 @@ func (t *TodoService) GetByTitle(title string) ([]model.TodoModel, error) {
 }
 
 func (t *TodoService) GetAll() ([]*model.TodoModel, error) {
-	var todos = []*model.TodoModel{}
 
-	err := t.db.Find(&todos).Error
-	return todos, err
+	return httpUtil.FindAll[*model.TodoModel](t.db)
 }
 
 func (t *TodoService) Delete(id uint) error {
-	return t.db.Delete(&model.TodoModel{}, id).Error
+	return httpUtil.Delete[model.TodoModel](t.db, id)
 }
