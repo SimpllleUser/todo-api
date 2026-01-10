@@ -21,6 +21,7 @@ func SetupRoutes(r *gin.Engine,
 	todoHandler *handler.TodoController,
 	userHandler *handler.UserController,
 	authHandler *handler.AuthController,
+	boardHandler *handler.BoardController,
 	userService *service.UserService,
 ) {
 	api := r.Group("/api/v1")
@@ -34,6 +35,17 @@ func SetupRoutes(r *gin.Engine,
 			todos.POST("", todoHandler.CreateTodos)
 			todos.PATCH("/:id", todoHandler.UpdateTodo)
 			todos.DELETE("/:id", todoHandler.DeleteTodo)
+		}
+
+		boards := api.Group("/boards")
+		boards.Use(middlewares.CheckAuth(userService))
+		{
+			boards.GET("", boardHandler.GetBoards)
+			boards.GET("/:id", boardHandler.GetBoardById)
+			boards.GET("/title/:title", boardHandler.GetBoardByTitle)
+			boards.POST("", boardHandler.CreateBoards)
+			boards.PATCH("/:id", boardHandler.UpdateBoard)
+			boards.DELETE("/:id", boardHandler.DeleteBoard)
 		}
 
 		auth := api.Group("/auth")

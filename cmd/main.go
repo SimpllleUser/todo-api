@@ -32,9 +32,11 @@ func main() {
 
 	userService := service.NewUserService(database.DB)
 	userScopeService := service.NewUserScopeService(database.DB)
+	// boardService := service.NewBoardService(database.DB)
 	authService := service.NewAuthService(userService)
 
 	todoController := handler.NewTodoController(userScopeService)
+	boardController := handler.NewBoardController(userScopeService)
 	userController := handler.NewUserController(userService, authService)
 	authController := handler.NewAuthController(authService)
 
@@ -42,11 +44,11 @@ func main() {
 
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-
 	routes.SetupRoutes(r,
 		todoController,
 		userController,
 		authController,
+		boardController,
 		userService,
 	)
 
