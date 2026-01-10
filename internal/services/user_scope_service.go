@@ -1,6 +1,8 @@
 package service
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type UserScopeService struct {
 	db *gorm.DB
@@ -17,11 +19,27 @@ func (s *UserScopeService) ForUser(userID uint) *UserScope {
 	}
 }
 
+func (s *UserScopeService) ForUserOwner(userID uint) *UserScopeBoard {
+	return &UserScopeBoard{
+		db:      s.db.Where("owner_id = ?", userID),
+		OwnerID: userID,
+	}
+}
+
 type UserScope struct {
 	db     *gorm.DB
 	userID uint
 }
 
+type UserScopeBoard struct {
+	db      *gorm.DB
+	OwnerID uint
+}
+
 func (u *UserScope) Todo() *TodoService {
 	return &TodoService{db: u.db, UserId: u.userID}
+}
+
+func (u *UserScopeBoard) Board() *BoardService {
+	return &BoardService{db: u.db, OwnerID: u.OwnerID}
 }
