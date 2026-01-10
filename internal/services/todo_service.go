@@ -27,7 +27,7 @@ func (t *TodoService) Create(todo *model.TodoCreateRequest) (*model.TodoModel, e
 	if !v.Validate() {
 		return nil, fmt.Errorf("validation failed: %v", v.Errors)
 	}
-	t.db.Create(todoModel)
+	httpUtil.Create[model.TodoModel](t.db, todoModel)
 	return todoModel, nil
 }
 
