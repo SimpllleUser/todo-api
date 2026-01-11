@@ -46,6 +46,7 @@ func SetupRoutes(r *gin.Engine,
 			boards.POST("", boardHandler.CreateBoards)
 			boards.PATCH("/:id", boardHandler.UpdateBoard)
 			boards.DELETE("/:id", boardHandler.DeleteBoard)
+			boards.PATCH("/:id/users", boardHandler.AddUsers)
 		}
 
 		auth := api.Group("/auth")
