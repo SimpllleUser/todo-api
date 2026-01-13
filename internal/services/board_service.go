@@ -68,6 +68,8 @@ func (t *BoardService) Delete(id uint) error {
 }
 
 func (t *BoardService) AddUsers(boardID uint, userIDs []uint) (*model.BoardModel, error) {
+	// TODO add repository pattern
+
 	var board model.BoardModel
 	if err := t.db.First(&board, boardID).Error; err != nil {
 		return nil, err
