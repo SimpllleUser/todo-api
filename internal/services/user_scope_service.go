@@ -36,8 +36,8 @@ type UserScopeBoard struct {
 	OwnerID uint
 }
 
-func (u *UserScope) Todo() *TodoService {
-	return &TodoService{db: u.db, UserId: u.userID}
+func (u *UserScope) Task() *TaskService {
+	return &TaskService{db: u.db, UserID: u.userID}
 }
 
 func (u *UserScopeBoard) Board() *BoardService {

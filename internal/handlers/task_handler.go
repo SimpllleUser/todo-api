@@ -3,80 +3,81 @@ package handler
 import (
 	model "example/todo-api/internal/models"
 	service "example/todo-api/internal/services"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type TodoController struct {
+type TaskController struct {
 	userScope *service.UserScopeService
 }
 
-func NewTodoController(uService *service.UserScopeService) *TodoController {
-	return &TodoController{
+func NewTaskController(uService *service.UserScopeService) *TaskController {
+	return &TaskController{
 		userScope: uService,
 	}
 }
 
-func (tc *TodoController) getUserId(c *gin.Context) uint {
+func (tc *TaskController) getUserId(c *gin.Context) uint {
 	return c.GetUint("userId")
 }
 
-func (tc *TodoController) forUser(c *gin.Context) *service.TodoService {
+func (tc *TaskController) ForUser(c *gin.Context) *service.TaskService {
 	userId := tc.getUserId(c)
-	return tc.userScope.ForUser(userId).Todo()
+	return tc.userScope.ForUser(userId).Task()
 }
 
-// GetTodos godoc
+// GetTasks godoc
 //
-//	@Summary		Get all todos
-//	@Description	get todos
-//	@Tags			Todos
+//	@Summary		Get all tasks
+//	@Description	get tasks
+//	@Tags			Tasks
 //	@Produce		json
-//	@Success		200	{array}		model.TodoModel
+//	@Success		200	{array}		model.TaskModel
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
-//	@Router			/todos [get]
+//	@Router			/tasks [get]
 //
 // @Security BearerAuth
-func (tc *TodoController) GetTodos(c *gin.Context) {
+func (tc *TaskController) GetTasks(c *gin.Context) {
 
-	todos, err := tc.forUser(c).GetAll()
+	tasks, err := tc.ForUser(c).GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": todos,
+		"data": tasks,
 	})
 }
 
-// CreateTodos godoc
+// CreateTasks godoc
 //
-//	@Summary		Create todo
-//	@Description	Create todo
-//	@Tags			Todos
-//	@Param			todo	body	model.TodoCreateRequest	true	"Todo data"
+//	@Summary		Create task
+//	@Description	Create task
+//	@Tags			Tasks
+//	@Param			task	body	model.TaskCreateRequest	true	"Task data"
 //	@Produce		json
 //	@accept			json
-//	@Success		200	{object}	model.TodoModel
+//	@Success		200	{object}	model.TaskModel
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
-//	@Router			/todos [post]
+//	@Router			/tasks [post]
 //
 // @Security BearerAuth
-func (tc *TodoController) CreateTodos(c *gin.Context) {
-	var todo model.TodoCreateRequest
+func (tc *TaskController) CreateTasks(c *gin.Context) {
+	var task model.TaskCreateRequest
 
-	if err := c.ShouldBindJSON(&todo); err != nil {
+	if err := c.ShouldBindJSON(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	createdTodo, err := tc.forUser(c).Create(&todo)
+	createdTask, err := tc.ForUser(c).Create(&task)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -84,25 +85,27 @@ func (tc *TodoController) CreateTodos(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("Created Task:", createdTask)
+
 	c.JSON(http.StatusCreated, gin.H{
-		"data": createdTodo,
+		"data": createdTask,
 	})
 }
 
-// GetTodoById godoc
+// GetTaskById godoc
 //
-//	@Summary		Get todo by id
-//	@Description	get todo by id
-//	@Param			id	path	int	true	"Todo ID"
-//	@Tags			Todos
+//	@Summary		Get task by id
+//	@Description	get task by id
+//	@Param			id	path	int	true	"Task ID"
+//	@Tags			Tasks
 //	@Produce		json
-//	@Success		302	{object}	model.TodoModel
+//	@Success		302	{object}	model.TaskModel
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
-//	@Router			/todos/:id [get]
+//	@Router			/tasks/:id [get]
 //
 // @Security BearerAuth
-func (tc *TodoController) GetTodoById(c *gin.Context) {
+func (tc *TaskController) GetTaskById(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 
 	if err != nil {
@@ -111,7 +114,7 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 
 	}
 
-	todo, err := tc.forUser(c).GetById(uint(id))
+	task, err := tc.ForUser(c).GetById(uint(id))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -119,24 +122,24 @@ func (tc *TodoController) GetTodoById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusFound, gin.H{
-		"data": todo,
+		"data": task,
 	})
 }
 
-// GetTodoByTitle godoc
+// GetTaskByTitle godoc
 //
-//	@Summary		Get todo by title
-//	@Description	get todo by title
-//	@Param			title	path	string	true	"Todo title"
-//	@Tags			Todos
+//	@Summary		Get task by title
+//	@Description	get task by title
+//	@Param			title	path	string	true	"Task title"
+//	@Tags			Tasks
 //	@Produce		json
-//	@Success		200	{object}	model.TodoModel
+//	@Success		200	{object}	model.TaskModel
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
-//	@Router			/todos/title/:title [get]
+//	@Router			/tasks/title/:title [get]
 //
 // @Security BearerAuth
-func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
+func (tc *TaskController) GetTaskByTitle(c *gin.Context) {
 	println(c.Params)
 	title := c.Param("title")
 
@@ -146,7 +149,7 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 
 	}
 
-	todo, err := tc.forUser(c).GetByTitle(title)
+	task, err := tc.ForUser(c).GetByTitle(title)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -154,45 +157,45 @@ func (tc *TodoController) GetTodoByTitle(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusFound, gin.H{
-		"data": todo,
+		"data": task,
 	})
 }
 
-// UpdateTodo godoc
+// UpdateTask godoc
 //
-//	@Summary		Update todo
-//	@Description	update todo
-//	@Tags			Todos
-//	@Param			todo	body	model.TodoModel	true	"Todo data"
+//	@Summary		Update task
+//	@Description	update task
+//	@Tags			Tasks
+//	@Param			task	body	model.TaskModel	true	"Task data"
 //	@Produce		json
 //	@accept			json
-//	@Success		200	{object}	model.TodoModel
+//	@Success		200	{object}	model.TaskModel
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
-//	@Router			/todos [put]
+//	@Router			/tasks [put]
 //
 // @Security BearerAuth
-func (tc *TodoController) UpdateTodo(c *gin.Context) {
+func (tc *TaskController) UpdateTask(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 
-	todo, err := tc.forUser(c).GetById(uint(id))
+	task, err := tc.ForUser(c).GetById(uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := c.ShouldBindJSON(todo); err != nil {
+	if err := c.ShouldBindJSON(task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	if err := tc.forUser(c).Update(todo); err != nil {
+	if err := tc.ForUser(c).Update(task); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -200,24 +203,24 @@ func (tc *TodoController) UpdateTodo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": todo,
+		"data": task,
 	})
 }
 
-// DeleteTodo godoc
+// DeleteTask godoc
 //
-//	@Summary		Delete todo by id
-//	@Description	delete todo by id
-//	@Param			id	path	int	true	"Todo ID"
-//	@Tags			Todos
+//	@Summary		Delete task by id
+//	@Description	delete task by id
+//	@Param			id	path	int	true	"Task ID"
+//	@Tags			Tasks
 //	@Produce		json
 //	@Success		200	{object}	model.BooleanResponse
 //	@Failure		400	{object}	model.HTTPError	"Invalid request"
 //	@Failure		500	{object}	model.HTTPError	"Internal server error"
-//	@Router			/todos/:id [delete]
+//	@Router			/tasks/:id [delete]
 //
 // @Security BearerAuth
-func (tc *TodoController) DeleteTodo(c *gin.Context) {
+func (tc *TaskController) DeleteTask(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 
 	if err != nil {
@@ -225,7 +228,7 @@ func (tc *TodoController) DeleteTodo(c *gin.Context) {
 		return
 	}
 
-	if err := tc.forUser(c).Delete(uint(id)); err != nil {
+	if err := tc.ForUser(c).Delete(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -234,4 +237,23 @@ func (tc *TodoController) DeleteTodo(c *gin.Context) {
 		"data": true,
 	})
 
+}
+
+func (tc *TaskController) GetBoardTasks(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Board ID"})
+		return
+	}
+
+	tasks, err := tc.ForUser(c).GetBoardTasks(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": tasks,
+	})
 }

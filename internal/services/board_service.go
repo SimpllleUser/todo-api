@@ -68,12 +68,12 @@ func (t *BoardService) Delete(id uint) error {
 }
 
 func (t *BoardService) AddUsers(boardID uint, userIDs []uint) (*model.BoardModel, error) {
+	db := t.originalDB
+
 	var board model.BoardModel
-	if err := t.db.First(&board, boardID).Error; err != nil {
+	if err := db.First(&board, boardID).Error; err != nil {
 		return nil, err
 	}
-
-	db := t.db.Session(&gorm.Session{NewDB: true})
 
 	users := make([]model.UserModel, len(userIDs))
 	for i, userID := range userIDs {

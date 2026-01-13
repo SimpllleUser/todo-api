@@ -19,7 +19,7 @@ func InitDB(pathToDB string) {
 		panic("failed connect to DB")
 	}
 
-	err = database.AutoMigrate(&model.TodoModel{}, &model.UserModel{})
+	err = database.AutoMigrate(&model.TaskModel{}, &model.UserModel{})
 	if err != nil {
 		log.Fatal("Error on MIGRATE DB")
 	}
