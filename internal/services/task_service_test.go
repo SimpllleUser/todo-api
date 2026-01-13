@@ -11,23 +11,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func seedTodos(t *testing.T, service *TodoService, count int) []model.TodoModel {
-	todos := make([]model.TodoModel, 0, count)
+func seedTasks(t *testing.T, service *TaskService, count int) []model.TaskModel {
+	todos := make([]model.TaskModel, 0, count)
 
 	for index := 0; index < count; index++ {
-		todoReq := model.TodoCreateRequest{
-			Title:       fmt.Sprintf("Todo title #%d", index),
-			Description: fmt.Sprintf("Todo description #%d", index),
+		todoReq := model.TaskCreateRequest{
+			Title:       fmt.Sprintf("Task title #%d", index),
+			Description: fmt.Sprintf("Task description #%d", index),
 		}
 
-		createdTodo, err := service.Create(&todoReq)
+		createdTask, err := service.Create(&todoReq)
 		require.NoError(t, err)
 
-		todos = append(todos, model.TodoModel{
-			ID:          createdTodo.ID,
-			Title:       createdTodo.Title,
-			Description: createdTodo.Description,
-			Completed:   createdTodo.Completed,
+		todos = append(todos, model.TaskModel{
+			ID:          createdTask.ID,
+			Title:       createdTask.Title,
+			Description: createdTask.Description,
+			Completed:   createdTask.Completed,
 		})
 
 	}
@@ -35,52 +35,52 @@ func seedTodos(t *testing.T, service *TodoService, count int) []model.TodoModel 
 	return todos
 }
 
-func TestCreateTodo(t *testing.T) {
+func TestCreateTask(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	todo := &model.TodoCreateRequest{
+	todo := &model.TaskCreateRequest{
 		Title:       "Test title",
 		Description: "Test description",
 	}
 
-	createdTodo, err := todoService.Create(todo)
+	createdTask, err := todoService.Create(todo)
 	require.NoError(t, err)
 
-	var result model.TodoModel
+	var result model.TaskModel
 	err = db.WithContext(ctx).First(&result, "title = ?", "Test title").Error
 
 	require.NoError(t, err)
 
-	assert.Equal(t, createdTodo.Title, result.Title)
-	assert.Equal(t, createdTodo.Description, result.Description)
+	assert.Equal(t, createdTask.Title, result.Title)
+	assert.Equal(t, createdTask.Description, result.Description)
 	assert.False(t, result.Completed)
 
 }
 
-func TestValidationCreateTodo(t *testing.T) {
+func TestValidationCreateTask(t *testing.T) {
 	t.Parallel()
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
 	tests := []struct {
 		name           string
-		todo           *model.TodoCreateRequest
+		todo           *model.TaskCreateRequest
 		validationRule string
 		wantErr        bool
 	}{
 		{
 			name: "Valid todo title",
-			todo: &model.TodoCreateRequest{
-				Title: "Todo valid title",
+			todo: &model.TaskCreateRequest{
+				Title: "Task valid title",
 			},
 			wantErr: false,
 		},
 		{
 			name: "Empty todo title",
-			todo: &model.TodoCreateRequest{
+			todo: &model.TaskCreateRequest{
 				Title: "",
 			},
 			validationRule: "required",
@@ -88,7 +88,7 @@ func TestValidationCreateTodo(t *testing.T) {
 		},
 		{
 			name: "Min lens todo title",
-			todo: &model.TodoCreateRequest{
+			todo: &model.TaskCreateRequest{
 				Title: "Ab",
 			},
 			validationRule: "minLen",
@@ -96,7 +96,7 @@ func TestValidationCreateTodo(t *testing.T) {
 		},
 		{
 			name: "Trim todo title",
-			todo: &model.TodoCreateRequest{
+			todo: &model.TaskCreateRequest{
 				Title: "   ",
 			},
 			validationRule: "required",
@@ -121,61 +121,61 @@ func TestValidationCreateTodo(t *testing.T) {
 
 }
 
-func TestUpdateTodo(t *testing.T) {
+func TestUpdateTask(t *testing.T) {
 	t.Parallel()
 
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	todo := &model.TodoCreateRequest{
+	todo := &model.TaskCreateRequest{
 		Title:       "Test item todo title",
 		Description: "Test item todo description",
 	}
 
-	createdTodo, err := todoService.Create(todo)
+	createdTask, err := todoService.Create(todo)
 	require.NoError(t, err)
 
-	updateTodo := &model.TodoModel{
-		ID:          createdTodo.ID,
+	updateTask := &model.TaskModel{
+		ID:          createdTask.ID,
 		Title:       "Test item todo title updated",
 		Description: "Test item todo description updated",
 		Completed:   true,
 	}
 
-	err = todoService.Update(updateTodo)
+	err = todoService.Update(updateTask)
 	require.NoError(t, err)
 
-	var result model.TodoModel
+	var result model.TaskModel
 	require.NoError(t, db.First(&result, 1).Error)
 
-	assert.Equal(t, updateTodo.Title, result.Title)
-	assert.Equal(t, updateTodo.Description, result.Description)
-	assert.Equal(t, updateTodo.Completed, result.Completed)
+	assert.Equal(t, updateTask.Title, result.Title)
+	assert.Equal(t, updateTask.Description, result.Description)
+	assert.Equal(t, updateTask.Completed, result.Completed)
 
 }
 
-func TestValidationUpdateTodo(t *testing.T) {
+func TestValidationUpdateTask(t *testing.T) {
 
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
 	tests := []struct {
 		name           string
-		todo           *model.TodoModel
+		todo           *model.TaskModel
 		validationRule string
 		wantErr        bool
 	}{
 		{
 			name: "Valid todo title",
-			todo: &model.TodoModel{
+			todo: &model.TaskModel{
 				ID:    1,
-				Title: "Todo valid title",
+				Title: "Task valid title",
 			},
 			wantErr: false,
 		},
 		{
 			name: "Empty todo title",
-			todo: &model.TodoModel{
+			todo: &model.TaskModel{
 				ID:    1,
 				Title: "",
 			},
@@ -184,7 +184,7 @@ func TestValidationUpdateTodo(t *testing.T) {
 		},
 		{
 			name: "Min lens todo title",
-			todo: &model.TodoModel{
+			todo: &model.TaskModel{
 				ID:    1,
 				Title: "Ab",
 			},
@@ -193,7 +193,7 @@ func TestValidationUpdateTodo(t *testing.T) {
 		},
 		{
 			name: "Trim todo title",
-			todo: &model.TodoModel{
+			todo: &model.TaskModel{
 				ID:    1,
 				Title: "   ",
 			},
@@ -220,11 +220,11 @@ func TestValidationUpdateTodo(t *testing.T) {
 
 }
 
-func TestFindByIdTodo(t *testing.T) {
+func TestFindByIdTask(t *testing.T) {
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	todo := &model.TodoCreateRequest{
+	todo := &model.TaskCreateRequest{
 		Title: "Test title",
 	}
 
@@ -244,48 +244,48 @@ func TestFindByIdTodo(t *testing.T) {
 
 }
 
-func TestFindByTitleOneMoreTodos(t *testing.T) {
+func TestFindByTitleOneMoreTasks(t *testing.T) {
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	todos := seedTodos(t, todoService, 10)
+	todos := seedTasks(t, todoService, 10)
 
 	todoFromList := todos[:2]
 
-	foundTodos, err := todoService.GetByTitle("Todo")
+	foundTasks, err := todoService.GetByTitle("Task")
 
-	assert.Equal(t, foundTodos, todoFromList)
-	assert.Len(t, foundTodos, 2)
-
-	require.NoError(t, err)
-
-}
-
-func TestFindByTitleTodos(t *testing.T) {
-	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
-
-	seedTodos := seedTodos(t, todoService, 10)
-
-	currentTodo := seedTodos[5]
-
-	foundTodos, err := todoService.GetByTitle("Todo title #5")
-
-	assert.Equal(t, foundTodos[0], currentTodo)
+	assert.Equal(t, foundTasks, todoFromList)
+	assert.Len(t, foundTasks, 2)
 
 	require.NoError(t, err)
 
 }
 
-func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
+func TestFindByTitleTasks(t *testing.T) {
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	seedTodos(t, todoService, 10)
+	seedTasks := seedTasks(t, todoService, 10)
 
-	foundTodos, err := todoService.GetByTitle("Some test random text qwerty")
+	currentTask := seedTasks[5]
 
-	assert.Len(t, foundTodos, 0)
+	foundTasks, err := todoService.GetByTitle("Task title #5")
+
+	assert.Equal(t, foundTasks[0], currentTask)
+
+	require.NoError(t, err)
+
+}
+
+func TestFindByTitleTasksWithEmptyResult(t *testing.T) {
+	db := test_utils.SetupTestDB(t)
+	todoService := NewTaskService(db)
+
+	seedTasks(t, todoService, 10)
+
+	foundTasks, err := todoService.GetByTitle("Some test random text qwerty")
+
+	assert.Len(t, foundTasks, 0)
 
 	require.NoError(t, err)
 
@@ -295,16 +295,16 @@ func TestFindByTitleTodosWithEmptyResult(t *testing.T) {
 
 func TestGetAll(t *testing.T) {
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	seededTodos := seedTodos(t, todoService, 10)
+	seededTasks := seedTasks(t, todoService, 10)
 
-	foundTodos, err := todoService.GetAll()
+	foundTasks, err := todoService.GetAll()
 
-	assert.Len(t, foundTodos, 10)
+	assert.Len(t, foundTasks, 10)
 
-	for index, seededTodo := range seededTodos {
-		assert.Equal(t, seededTodo, *foundTodos[index])
+	for index, seededTask := range seededTasks {
+		assert.Equal(t, seededTask, *foundTasks[index])
 	}
 
 	require.NoError(t, err)
@@ -313,9 +313,9 @@ func TestGetAll(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	seedTodos(t, todoService, 3)
+	seedTasks(t, todoService, 3)
 
 	todoListBeforeRemove, err := todoService.GetAll()
 	require.NoError(t, err)
@@ -332,9 +332,9 @@ func TestDelete(t *testing.T) {
 
 func TestDeleteWithUnrealId(t *testing.T) {
 	db := test_utils.SetupTestDB(t)
-	todoService := NewTodoService(db)
+	todoService := NewTaskService(db)
 
-	seedTodos(t, todoService, 3)
+	seedTasks(t, todoService, 3)
 
 	todoListBeforeRemove, err := todoService.GetAll()
 	require.NoError(t, err)

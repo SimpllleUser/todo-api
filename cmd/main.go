@@ -35,7 +35,7 @@ func main() {
 	// boardService := service.NewBoardService(database.DB)
 	authService := service.NewAuthService(userService)
 
-	todoController := handler.NewTodoController(userScopeService)
+	todoController := handler.NewTaskController(userScopeService)
 	boardController := handler.NewBoardController(userScopeService)
 	userController := handler.NewUserController(userService, authService)
 	authController := handler.NewAuthController(authService)
