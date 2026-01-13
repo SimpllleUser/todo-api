@@ -11,24 +11,38 @@ import (
 
 type TaskService struct {
 	db     *gorm.DB
-	UserId uint
+	UserID uint
 }
 
-func NewTaskService(db *gorm.DB, userId uint) *TaskService {
-	return &TaskService{db: db, UserId: userId}
+func NewTaskService(db *gorm.DB, userID uint) *TaskService {
+	return &TaskService{db: db, UserID: userID}
 }
 
-func (t *TaskService) Create(task *model.TaskCreateRequest) (*model.TaskModel, error) {
-	var taskModel = &model.TaskModel{
-		TaskBaseFields: task.TaskBaseFields,
-		UserId:         t.UserId,
+func (t *TaskService) Create(req *model.TaskCreateRequest) (*model.TaskModel, error) {
+	if req.BoardID == 0 {
+		return nil, fmt.Errorf("board_id is required")
 	}
-	v := validate.Struct(task)
+
+	// TODO check if board exists
+	// TODO add check if board exists and belongs to user
+
+	task := &model.TaskModel{
+		Title:       req.Title,
+		Description: req.Description,
+		BoardID:     req.BoardID,
+		UserID:      t.UserID,
+	}
+
+	v := validate.Struct(req)
 	if !v.Validate() {
 		return nil, fmt.Errorf("validation failed: %v", v.Errors)
 	}
-	httpUtil.Create[model.TaskModel](t.db, taskModel)
-	return taskModel, nil
+
+	if err := httpUtil.Create(t.db, task); err != nil {
+		return nil, err
+	}
+
+	return task, nil
 }
 
 func (t *TaskService) Update(task *model.TaskModel) error {

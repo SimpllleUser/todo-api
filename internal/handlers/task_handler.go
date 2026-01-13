@@ -3,6 +3,7 @@ package handler
 import (
 	model "example/todo-api/internal/models"
 	service "example/todo-api/internal/services"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -83,6 +84,8 @@ func (tc *TaskController) CreateTasks(c *gin.Context) {
 		})
 		return
 	}
+
+	fmt.Println("Created Task:", createdTask)
 
 	c.JSON(http.StatusCreated, gin.H{
 		"data": createdTask,

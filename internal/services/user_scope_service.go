@@ -37,7 +37,7 @@ type UserScopeBoard struct {
 }
 
 func (u *UserScope) Task() *TaskService {
-	return &TaskService{db: u.db, UserId: u.userID}
+	return &TaskService{db: u.db, UserID: u.userID}
 }
 
 func (u *UserScopeBoard) Board() *BoardService {

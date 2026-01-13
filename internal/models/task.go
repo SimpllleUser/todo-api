@@ -1,23 +1,22 @@
 package model
 
-type TaskBaseFields struct {
-	ID          uint   `gorm:"primaryKey" json:"id" example:"1"`
-	Title       string `gorm:"not null" json:"title" validate:"required|minLen:3" filter:"trim" message:"required:{field} is required" label:"Title" example:"Buy groceries"`
-	Description string `gorm:"null" json:"description" example:"Milk, eggs, bread"`
-	Completed   bool   `gorm:"default:false" json:"completed" example:"false"`
-	TaskBoardId
-}
-
-type TaskBoardId struct {
-	BoardID uint `json:"board_id" gorm:"not null"`
-}
+import "time"
 
 type TaskModel struct {
-	TaskBaseFields
-	UserId uint `gorm:"not null" json:"user_id" example:"1"`
+	ID          uint      `json:"id" gorm:"primaryKey"`
+	Title       string    `json:"title" gorm:"not null"`
+	Description string    `json:"description"`
+	Completed   bool      `json:"completed" gorm:"default:false"`
+	BoardID     uint      `json:"board_id" gorm:"not null"`
+	UserID      uint      `json:"user_id" gorm:"not null"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
+
 type TaskCreateRequest struct {
-	TaskBaseFields
+	Title       string `json:"title" binding:"required,min=3" validate:"required|minLen:3"`
+	Description string `json:"description"`
+	BoardID     uint   `json:"board_id" binding:"required" validate:"required"`
 }
 
 func (TaskModel) TableName() string {
