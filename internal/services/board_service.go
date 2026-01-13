@@ -10,19 +10,24 @@ import (
 )
 
 type BoardService struct {
-	db      *gorm.DB
-	OwnerID uint
+	db         *gorm.DB
+	originalDB *gorm.DB // додай це
+	OwnerID    uint
 }
 
 func NewBoardService(db *gorm.DB, UserId uint) *BoardService {
-	return &BoardService{db: db, OwnerID: UserId}
+	return &BoardService{
+		db:         db,
+		originalDB: db.Session(&gorm.Session{NewDB: true}), // новий чистий DB
+		OwnerID:    UserId,
+	}
 }
 
 func (t *BoardService) Create(board *model.BoardCreateRequest) (*model.BoardModel, error) {
 
 	var BoardModel = &model.BoardModel{
-		BoardBaseModel: board.BoardBaseModel,
-		OwnerID:        t.OwnerID,
+		Title:   board.Title,
+		OwnerID: t.OwnerID,
 	}
 
 	fmt.Println("Creating board for owner ID:", t.OwnerID)
@@ -60,4 +65,28 @@ func (t *BoardService) GetAll() ([]*model.BoardModel, error) {
 
 func (t *BoardService) Delete(id uint) error {
 	return httpUtil.Delete[model.BoardModel](t.db, id)
+}
+
+func (t *BoardService) AddUsers(boardID uint, userIDs []uint) (*model.BoardModel, error) {
+	var board model.BoardModel
+	if err := t.db.First(&board, boardID).Error; err != nil {
+		return nil, err
+	}
+
+	db := t.db.Session(&gorm.Session{NewDB: true})
+
+	users := make([]model.UserModel, len(userIDs))
+	for i, userID := range userIDs {
+		users[i] = model.UserModel{ID: userID}
+	}
+
+	if err := db.Model(&board).Association("Users").Append(&users); err != nil {
+		return nil, err
+	}
+
+	if err := db.Preload("Users").First(&board, boardID).Error; err != nil {
+		return nil, err
+	}
+
+	return &board, nil
 }
