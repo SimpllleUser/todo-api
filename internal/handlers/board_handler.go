@@ -137,7 +137,6 @@ func (tc *BoardController) GetBoardById(c *gin.Context) {
 //
 // @Security BearerAuth
 func (tc *BoardController) GetBoardByTitle(c *gin.Context) {
-	println(c.Params)
 	title := c.Param("title")
 
 	if title == "" {
@@ -234,4 +233,29 @@ func (tc *BoardController) DeleteBoard(c *gin.Context) {
 		"data": true,
 	})
 
+}
+
+func (tc *BoardController) AddUsers(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	var req struct {
+		UserIDs []uint `json:"user_ids" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	board, err := tc.forUser(c).AddUsers(uint(id), req.UserIDs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": board})
 }
