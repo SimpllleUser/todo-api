@@ -24,7 +24,7 @@ func (tc *TaskController) getUserId(c *gin.Context) uint {
 	return c.GetUint("userId")
 }
 
-func (tc *TaskController) forUser(c *gin.Context) *service.TaskService {
+func (tc *TaskController) ForUser(c *gin.Context) *service.TaskService {
 	userId := tc.getUserId(c)
 	return tc.userScope.ForUser(userId).Task()
 }
@@ -42,7 +42,7 @@ func (tc *TaskController) forUser(c *gin.Context) *service.TaskService {
 // @Security BearerAuth
 func (tc *TaskController) GetTasks(c *gin.Context) {
 
-	tasks, err := tc.forUser(c).GetAll()
+	tasks, err := tc.ForUser(c).GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -77,7 +77,7 @@ func (tc *TaskController) CreateTasks(c *gin.Context) {
 		return
 	}
 
-	createdTask, err := tc.forUser(c).Create(&task)
+	createdTask, err := tc.ForUser(c).Create(&task)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -114,7 +114,7 @@ func (tc *TaskController) GetTaskById(c *gin.Context) {
 
 	}
 
-	task, err := tc.forUser(c).GetById(uint(id))
+	task, err := tc.ForUser(c).GetById(uint(id))
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -149,7 +149,7 @@ func (tc *TaskController) GetTaskByTitle(c *gin.Context) {
 
 	}
 
-	task, err := tc.forUser(c).GetByTitle(title)
+	task, err := tc.ForUser(c).GetByTitle(title)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -182,7 +182,7 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	task, err := tc.forUser(c).GetById(uint(id))
+	task, err := tc.ForUser(c).GetById(uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -195,7 +195,7 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 		return
 	}
 
-	if err := tc.forUser(c).Update(task); err != nil {
+	if err := tc.ForUser(c).Update(task); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -228,7 +228,7 @@ func (tc *TaskController) DeleteTask(c *gin.Context) {
 		return
 	}
 
-	if err := tc.forUser(c).Delete(uint(id)); err != nil {
+	if err := tc.ForUser(c).Delete(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -237,4 +237,23 @@ func (tc *TaskController) DeleteTask(c *gin.Context) {
 		"data": true,
 	})
 
+}
+
+func (tc *TaskController) GetBoardTasks(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Board ID"})
+		return
+	}
+
+	tasks, err := tc.ForUser(c).GetBoardTasks(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": tasks,
+	})
 }

@@ -35,6 +35,7 @@ func SetupRoutes(r *gin.Engine,
 			tasks.POST("", taskHandler.CreateTasks)
 			tasks.PATCH("/:id", taskHandler.UpdateTask)
 			tasks.DELETE("/:id", taskHandler.DeleteTask)
+			tasks.GET("/boards/:id", taskHandler.GetBoardTasks)
 		}
 
 		boards := api.Group("/boards")

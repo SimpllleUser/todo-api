@@ -71,3 +71,9 @@ func (t *TaskService) GetAll() ([]*model.TaskModel, error) {
 func (t *TaskService) Delete(id uint) error {
 	return httpUtil.Delete[model.TaskModel](t.db, id)
 }
+
+func (t *TaskService) GetBoardTasks(boardID uint) ([]model.TaskModel, error) {
+	var tasks []model.TaskModel
+	err := t.db.Where("board_id = ?", boardID).Find(&tasks).Error
+	return tasks, err
+}
