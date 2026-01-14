@@ -10,22 +10,17 @@ import (
 )
 
 type BoardController struct {
-	userScope *service.UserScopeService
+	BoardService *service.BoardService
 }
 
-func NewBoardController(uService *service.UserScopeService) *BoardController {
+func NewBoardController(boardService *service.BoardService) *BoardController {
 	return &BoardController{
-		userScope: uService,
+		BoardService: boardService,
 	}
 }
 
-func (tc *BoardController) getUserId(c *gin.Context) uint {
+func (bc *BoardController) getUserId(c *gin.Context) uint {
 	return c.GetUint("userId")
-}
-
-func (tc *BoardController) forUser(c *gin.Context) *service.BoardService {
-	userId := tc.getUserId(c)
-	return tc.userScope.ForUserOwner(userId).Board()
 }
 
 // GetBoards godoc
@@ -39,11 +34,16 @@ func (tc *BoardController) forUser(c *gin.Context) *service.BoardService {
 //	@Router			/boards [get]
 //
 // @Security BearerAuth
-func (tc *BoardController) GetBoards(c *gin.Context) {
+func (bc *BoardController) GetBoards(c *gin.Context) {
 
-	boards, err := tc.forUser(c).GetAll()
+	userId := bc.getUserId(c)
+
+	boards, err := bc.BoardService.GetAll(userId)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -66,7 +66,7 @@ func (tc *BoardController) GetBoards(c *gin.Context) {
 //	@Router			/boards [post]
 //
 // @Security BearerAuth
-func (tc *BoardController) CreateBoards(c *gin.Context) {
+func (bc *BoardController) CreateBoards(c *gin.Context) {
 	var board model.BoardCreateRequest
 
 	if err := c.ShouldBindJSON(&board); err != nil {
@@ -75,8 +75,8 @@ func (tc *BoardController) CreateBoards(c *gin.Context) {
 		})
 		return
 	}
-
-	createdBoard, err := tc.forUser(c).Create(&board)
+	userId := bc.getUserId(c)
+	createdBoard, err := bc.BoardService.Create(&board, userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -102,7 +102,7 @@ func (tc *BoardController) CreateBoards(c *gin.Context) {
 //	@Router			/boards/:id [get]
 //
 // @Security BearerAuth
-func (tc *BoardController) GetBoardById(c *gin.Context) {
+func (bc *BoardController) GetBoardById(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 
 	if err != nil {
@@ -111,7 +111,9 @@ func (tc *BoardController) GetBoardById(c *gin.Context) {
 
 	}
 
-	board, err := tc.forUser(c).GetById(uint(id))
+	userId := bc.getUserId(c)
+
+	board, err := bc.BoardService.GetById(uint(id), userId)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -136,7 +138,7 @@ func (tc *BoardController) GetBoardById(c *gin.Context) {
 //	@Router			/boards/title/:title [get]
 //
 // @Security BearerAuth
-func (tc *BoardController) GetBoardByTitle(c *gin.Context) {
+func (bc *BoardController) GetBoardByTitle(c *gin.Context) {
 	title := c.Param("title")
 
 	if title == "" {
@@ -145,7 +147,8 @@ func (tc *BoardController) GetBoardByTitle(c *gin.Context) {
 
 	}
 
-	board, err := tc.forUser(c).GetByTitle(title)
+	userId := bc.getUserId(c)
+	board, err := bc.BoardService.GetByTitle(title, userId)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -171,14 +174,15 @@ func (tc *BoardController) GetBoardByTitle(c *gin.Context) {
 //	@Router			/boards [put]
 //
 // @Security BearerAuth
-func (tc *BoardController) UpdateBoard(c *gin.Context) {
+func (bc *BoardController) UpdateBoard(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 
-	board, err := tc.forUser(c).GetById(uint(id))
+	userId := bc.getUserId(c)
+	board, err := bc.BoardService.GetById(uint(id), userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -191,7 +195,8 @@ func (tc *BoardController) UpdateBoard(c *gin.Context) {
 		return
 	}
 
-	if err := tc.forUser(c).Update(board); err != nil {
+	updatedBoard, err := bc.BoardService.Update(board)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -199,7 +204,7 @@ func (tc *BoardController) UpdateBoard(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": board,
+		"data": updatedBoard,
 	})
 }
 
@@ -216,7 +221,7 @@ func (tc *BoardController) UpdateBoard(c *gin.Context) {
 //	@Router			/boards/:id [delete]
 //
 // @Security BearerAuth
-func (tc *BoardController) DeleteBoard(c *gin.Context) {
+func (bc *BoardController) DeleteBoard(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 
 	if err != nil {
@@ -224,7 +229,7 @@ func (tc *BoardController) DeleteBoard(c *gin.Context) {
 		return
 	}
 
-	if err := tc.forUser(c).Delete(uint(id)); err != nil {
+	if err := bc.BoardService.Delete(uint(id)); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -235,7 +240,7 @@ func (tc *BoardController) DeleteBoard(c *gin.Context) {
 
 }
 
-func (tc *BoardController) AddUsers(c *gin.Context) {
+func (bc *BoardController) AddUsers(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
@@ -251,7 +256,9 @@ func (tc *BoardController) AddUsers(c *gin.Context) {
 		return
 	}
 
-	board, err := tc.forUser(c).AddUsers(uint(id), req.UserIDs)
+	ownerId := bc.getUserId(c)
+
+	board, err := bc.BoardService.AddUsers(uint(id), ownerId, req.UserIDs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -32,13 +32,16 @@ func main() {
 	defer database.CloseDB()
 
 	userRepository := repository.NewUserRepository(database.DB)
+	taskRepository := repository.NewTaskRepository(database.DB)
+	boardRepository := repository.NewBoardRepository(database.DB)
+
 	userService := service.NewUserService(userRepository)
-	userScopeService := service.NewUserScopeService(database.DB)
-	// boardService := service.NewBoardService(database.DB)
+	taskService := service.NewTaskService(taskRepository, userRepository, boardRepository)
+	boardService := service.NewBoardService(userRepository, boardRepository)
 	authService := service.NewAuthService(userService)
 
-	todoController := handler.NewTaskController(userScopeService)
-	boardController := handler.NewBoardController(userScopeService)
+	todoController := handler.NewTaskController(taskService)
+	boardController := handler.NewBoardController(boardService)
 	userController := handler.NewUserController(userService, authService)
 	authController := handler.NewAuthController(authService)
 

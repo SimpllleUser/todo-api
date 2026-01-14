@@ -39,3 +39,12 @@ func (ur *UserRepository) Create(user *model.UserModel) (*model.UserModel, error
 	}
 	return user, nil
 }
+
+func (br *BoardRepository) FindByIDWithUsers(id uint) (*model.BoardModel, error) {
+	var board model.BoardModel
+	err := br.db.Preload("Users").First(&board, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &board, nil
+}

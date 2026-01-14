@@ -14,15 +14,15 @@ func NewBoardRepository(db *gorm.DB) *BoardRepository {
 	return &BoardRepository{db: db}
 }
 
-func (br *BoardRepository) FindByID(id uint) (*model.BoardModel, error) {
+func (br *BoardRepository) FindByID(id uint, ownerId uint) (*model.BoardModel, error) {
 	var board model.BoardModel
-	err := br.db.Find(&board, id).Error
+	err := br.db.Where("id = ? AND owner_id = ?", id, ownerId).Find(&board).Error
 	return &board, err
 }
 
-func (br *BoardRepository) FindAll() ([]model.BoardModel, error) {
+func (br *BoardRepository) FindAll(ownerId uint) ([]model.BoardModel, error) {
 	var boards []model.BoardModel
-	err := br.db.Find(&boards).Error
+	err := br.db.Where("owner_id = ?", ownerId).Find(&boards).Error
 	return boards, err
 }
 
@@ -47,8 +47,20 @@ func (br *BoardRepository) Update(board *model.BoardModel) (*model.BoardModel, e
 	return board, nil
 }
 
-func (br *BoardRepository) FindByTitle(title string) ([]model.BoardModel, error) {
+func (br *BoardRepository) FindByTitle(title string, ownerId uint) ([]model.BoardModel, error) {
 	var boards []model.BoardModel
-	err := br.db.Where("title LIKE ?", "%"+title+"%").Limit(2).Find(&boards).Error
+	err := br.db.Where("title LIKE ? AND owner_id = ?", "%"+title+"%", ownerId).Limit(2).Find(&boards).Error
 	return boards, err
+}
+
+func (br *BoardRepository) AddUsers(boardID uint, users []model.UserModel) error {
+	var board model.BoardModel
+	if err := br.db.Find(&board, boardID).Error; err != nil {
+		return err
+	}
+
+	if err := br.db.Model(&board).Association("Users").Append(&users); err != nil {
+		return err
+	}
+	return nil
 }

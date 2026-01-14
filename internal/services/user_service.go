@@ -6,25 +6,25 @@ import (
 )
 
 type UserService struct {
-	userRepository *repository.UserRepository
+	UserRepository *repository.UserRepository
 }
 
 func NewUserService(userRepository *repository.UserRepository) *UserService {
-	return &UserService{userRepository: userRepository}
+	return &UserService{UserRepository: userRepository}
 }
 
 func (u *UserService) FindById(id uint) (*model.UserModel, error) {
-	return u.userRepository.FindByID(id)
+	return u.UserRepository.FindByID(id)
 }
 
 func (u *UserService) FindByName(name string) (*model.UserModel, error) {
-	return u.userRepository.FindByName(name)
+	return u.UserRepository.FindByName(name)
 }
 
 func (u *UserService) FindByLogin(login string) (*model.UserModel, error) {
-	return u.userRepository.FindByLogin(login)
+	return u.UserRepository.FindByLogin(login)
 }
 
 func (u *UserService) Create(user *model.UserModel) (*model.UserModel, error) {
-	return u.userRepository.Create(user)
+	return u.UserRepository.Create(user)
 }
