@@ -4,6 +4,7 @@ import (
 	"example/todo-api/config"
 	"example/todo-api/internal/database"
 	handler "example/todo-api/internal/handlers"
+	"example/todo-api/internal/repository"
 	"example/todo-api/internal/routes"
 	service "example/todo-api/internal/services"
 
@@ -30,7 +31,8 @@ func main() {
 
 	defer database.CloseDB()
 
-	userService := service.NewUserService(database.DB)
+	userRepository := repository.NewUserRepository(database.DB)
+	userService := service.NewUserService(userRepository)
 	userScopeService := service.NewUserScopeService(database.DB)
 	// boardService := service.NewBoardService(database.DB)
 	authService := service.NewAuthService(userService)
