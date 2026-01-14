@@ -4,6 +4,7 @@ import (
 	"example/todo-api/config"
 	"example/todo-api/internal/database"
 	handler "example/todo-api/internal/handlers"
+	"example/todo-api/internal/repository"
 	"example/todo-api/internal/routes"
 	service "example/todo-api/internal/services"
 
@@ -30,13 +31,17 @@ func main() {
 
 	defer database.CloseDB()
 
-	userService := service.NewUserService(database.DB)
-	userScopeService := service.NewUserScopeService(database.DB)
-	// boardService := service.NewBoardService(database.DB)
+	userRepository := repository.NewUserRepository(database.DB)
+	taskRepository := repository.NewTaskRepository(database.DB)
+	boardRepository := repository.NewBoardRepository(database.DB)
+
+	userService := service.NewUserService(userRepository)
+	taskService := service.NewTaskService(taskRepository, userRepository, boardRepository)
+	boardService := service.NewBoardService(userRepository, boardRepository)
 	authService := service.NewAuthService(userService)
 
-	todoController := handler.NewTaskController(userScopeService)
-	boardController := handler.NewBoardController(userScopeService)
+	todoController := handler.NewTaskController(taskService)
+	boardController := handler.NewBoardController(boardService)
 	userController := handler.NewUserController(userService, authService)
 	authController := handler.NewAuthController(authService)
 

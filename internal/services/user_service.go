@@ -2,40 +2,29 @@ package service
 
 import (
 	model "example/todo-api/internal/models"
-
-	"gorm.io/gorm"
+	"example/todo-api/internal/repository"
 )
 
 type UserService struct {
-	db *gorm.DB
+	UserRepository *repository.UserRepository
 }
 
-func NewUserService(db *gorm.DB) *UserService {
-	return &UserService{db: db}
+func NewUserService(userRepository *repository.UserRepository) *UserService {
+	return &UserService{UserRepository: userRepository}
 }
 
 func (u *UserService) FindById(id uint) (*model.UserModel, error) {
-	var user model.UserModel
-	err := u.db.Find(&user, id).Error
-	return &user, err
+	return u.UserRepository.FindByID(id)
 }
 
 func (u *UserService) FindByName(name string) (*model.UserModel, error) {
-	var user model.UserModel
-	err := u.db.Where("name = ?", name).First(&user).Error
-	return &user, err
+	return u.UserRepository.FindByName(name)
 }
 
 func (u *UserService) FindByLogin(login string) (*model.UserModel, error) {
-	var user model.UserModel
-	err := u.db.Where("login = ?", login).First(&user).Error
-	return &user, err
+	return u.UserRepository.FindByLogin(login)
 }
 
 func (u *UserService) Create(user *model.UserModel) (*model.UserModel, error) {
-	err := u.db.Create(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	return u.UserRepository.Create(user)
 }

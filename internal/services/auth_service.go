@@ -15,19 +15,19 @@ type IAuthService interface {
 }
 
 type AuthService struct {
-	userService IAuthService
+	UserService IAuthService
 }
 
 const EXPIRE = time.Hour * 24
 
 func NewAuthService(us IAuthService) *AuthService {
 	return &AuthService{
-		userService: us,
+		UserService: us,
 	}
 }
 
 func (as *AuthService) Authenticate(login string, password string) (*model.UserModel, error) {
-	var userFound, err = as.userService.FindByLogin(login)
+	var userFound, err = as.UserService.FindByLogin(login)
 
 	if err != nil {
 		log.Println("Error user not found by login", err)
